@@ -2,7 +2,7 @@
 
 GitViz is a work-in-progress public repository explorer. It turns an unfamiliar GitHub repository into an evidence-backed map of its product capabilities, implementation flows, architecture, and project evolution.
 
-**Live preview:** ChatGPT Sites deployment in progress  
+**Live preview:** [gitviz.arpitsidana.chatgpt.site](https://gitviz.arpitsidana.chatgpt.site)  
 **Source:** [github.com/arpit-sidana/gitviz](https://github.com/arpit-sidana/gitviz)
 
 Paste a public repository URL to explore:
