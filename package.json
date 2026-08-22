@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "Evidence-backed repository understanding, in progress.",
   "scripts": {
+    "build": "rm -rf dist && mkdir -p dist && cp index.html styles.css app.js dist/",
     "test": "node --check app.js && node -e \"const fs=require('fs'); const html=fs.readFileSync('index.html','utf8'); const readme=fs.readFileSync('README.md','utf8'); for (const s of ['PUBLIC REPOSITORY EXPLORER','Orientation','Trace','Inspect']) if (!html.includes(s)) throw new Error('missing '+s); for (const s of ['Overview','Product Flow','Architecture','Evolution','Evaluation']) if (!readme.includes(s)) throw new Error('missing '+s); console.log('GitViz validation passed')\""
   }
 }
