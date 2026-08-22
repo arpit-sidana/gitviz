@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="GitViz — an evidence-backed map of unfamiliar repositories." />
+    <title>GitViz — Understand a repository</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./">gitviz<span>.</span></a>
+      <div class="topbar-meta">Repository intelligence, with receipts</div>
+    </header>
+
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">PUBLIC REPOSITORY EXPLORER</p>
+        <h1>Build a mental model<br /><em>before you read every file.</em></h1>
+        <p class="hero-copy">GitViz turns a public GitHub repository into an interactive map of its product capabilities, implementation flows, architecture, and history.</p>
+        <form class="repo-form" id="repo-form">
+          <input id="repo-url" type="url" placeholder="https://github.com/owner/repository" aria-label="Public GitHub repository URL" required />
+          <button type="submit">Explore repository <span>→</span></button>
+        </form>
+        <p class="form-note" id="form-note">Start with a curated example or paste any public GitHub repository.</p>
+      </section>
+
+      <section class="examples" aria-labelledby="examples-heading">
+        <div class="section-heading"><p class="eyebrow">START WITH A DEMO</p><h2 id="examples-heading">Three ways to see the map</h2></div>
+        <div class="example-grid">
+          <button class="example-card" data-repo="https://github.com/calcom/cal.com"><span class="card-kicker">PRODUCT / UI</span><strong>Cal.com</strong><small>Scheduling workflows, routes, and integrations</small><span class="card-arrow">↗</span></button>
+          <button class="example-card" data-repo="https://github.com/saleor/saleor"><span class="card-kicker">BUSINESS API</span><strong>Saleor</strong><small>Commerce domain, GraphQL API, and data model</small><span class="card-arrow">↗</span></button>
+          <button class="example-card" data-repo="https://github.com/langgenius/dify"><span class="card-kicker">AI PLATFORM</span><strong>Dify</strong><small>Visual workflows, agents, and model infrastructure</small><span class="card-arrow">↗</span></button>
+        </div>
+      </section>
+
+      <section class="principles" aria-label="GitViz product principles">
+        <div><span class="principle-number">01</span><strong>Follow the capability</strong><p>Start with what the product does, then trace it into code.</p></div>
+        <div><span class="principle-number">02</span><strong>Choose your depth</strong><p>Orientation, Trace, or Inspect. You decide how far to go.</p></div>
+        <div><span class="principle-number">03</span><strong>Trust the evidence</strong><p>Every material claim points back to source files or commits.</p></div>
+      </section>
+    </main>
+    <script src="./app.js"></script>
+  </body>
+</html>
