@@ -403,3 +403,4 @@ If time is constrained, cut AI enrichment and external visualization integration
 | 2026-08-21 | Defer Lucid/Figma/Miro integrations | The core interactive graph must prove value before external visualization work |
 | 2026-08-21 | Launch with Cal.com/Cal.diy, Saleor, and Dify | They provide understandable breadth across UI workflows, business APIs, and AI/infra-heavy visual systems |
 | 2026-08-22 | Replace persona/role framing with a user-controlled depth selector | The tabs should explain what they do while letting each reader choose how deeply to explore |
+| 2026-09-11 | Ship the interaction prototype with precomputed evidence snapshots before live ingestion | This validates the comprehension experience while deterministic analyzers are still being built |

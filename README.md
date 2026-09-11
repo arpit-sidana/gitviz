@@ -19,7 +19,7 @@ GitViz is intentionally narrow for its first release. It uses deterministic code
 
 ## Project status
 
-Work in progress. The locked product requirements are documented in [docs/PRD.md](docs/PRD.md). The current public slice is a validated landing experience; repository ingestion and the canonical graph are next.
+Work in progress. The locked product requirements are documented in [docs/PRD.md](docs/PRD.md). The current public prototype includes three precomputed repository demonstrations, the five exploration views, a shared depth selector, source-evidence inspection, project evolution, and known-answer evaluation. Live repository ingestion and deterministic analyzers remain in development.
 
 ## MVP focus
 
@@ -28,6 +28,14 @@ Work in progress. The locked product requirements are documented in [docs/PRD.md
 - Reduced file-structure analysis for other languages
 - Overview, Product Flow, Architecture, Evolution, and Evaluation views
 - Precomputed demos for a reliable hosted experience
+
+## What works today
+
+- Switch between Cal.com, Saleor, and Dify snapshots.
+- Explore Overview, Product Flow, Architecture, Evolution, and Evaluation.
+- Choose Orientation, Trace, or Inspect depth across every view.
+- Select components and inspect repository-relative source evidence.
+- See explicit limitations where structural evidence cannot prove runtime behavior.
 
 ## License
 
