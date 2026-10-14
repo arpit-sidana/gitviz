@@ -409,6 +409,8 @@ If time is constrained, cut AI enrichment and external visualization integration
 | 2026-10-14 | Draw labeled architecture edges and logical boundaries; parse Compose services; distinguish assumptions | A component cloud does not explain system behavior or deployment context |
 | 2026-10-14 | Add Product and Git views to Evolution using real merged PRs | File counts must link to PR diffs; feature grouping and rollout uncertainty must be explicit |
 | 2026-10-14 | Replace the visible Evaluation score with Sources & limits | The earlier score was illustrative. Do not claim measured quality without an executed, independently curated evaluation |
+| 2026-10-14 | Add a repository-adapted AWS network reference with traffic layers and an independent runtime-facts view | Requested staff-level deployment depth includes routing, security, failover and operations, without presenting proposed infrastructure as discovered production |
+| 2026-10-14 | Retain allowlisted Compose runtime metadata on the canonical graph | Images, published ports, networks, mounts, dependencies, profiles and health-check presence support inspectable runtime facts; environment values and credentials are excluded |
 
 ## 19. Accepted interaction refinements (October 2026)
 
@@ -419,3 +421,5 @@ If time is constrained, cut AI enrichment and external visualization integration
 - Evolution’s Product view groups PRs into interpreted feature themes. Its Git view exposes individual PRs, plain-English value, exact diff counts, merge commits, and sampled changed files. Merge dates do not establish launch dates.
 - Offline snapshot curation verifies paths against a complete, pinned repository tree and fetches merged PR metadata. Curated relationships and feature summaries remain interpretations; file existence alone does not establish call behavior.
 - Internal evaluation goals remain part of the roadmap. The current demos expose source coverage and limits without a quality pass rate.
+- Architecture offers AWS deployment & network, Repository components, and Runtime configuration. The AWS design shows two availability zones, six subnet boundaries, ingress/egress routing, proposed resource placement, database standby versus readable replicas, storage and operational dependencies. Request, jobs/data, outbound and operations filters reduce visual density. Every resource and connection has keyboard-accessible textual detail; a route register exposes destinations and targets.
+- The AWS view is a proposed, curated reference adapted to each offline demo, not an infrastructure discovery engine, production claim, IaC export or assurance of resilience. Repository facts and proposed choices are distinguished per detail. Saleor has no parsed deployment manifest in the current snapshot. Validate capacity, protocols, TLS, security, migration, backup and failover before operational use.

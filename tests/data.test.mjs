@@ -38,3 +38,27 @@ test('Compose dependency parser respects profiles, both depends_on forms, and ex
  assert.match(graph.nodes.find(n=>n.id==='compose-worker').detail,/Optional profile: jobs/);
  assert.ok(!JSON.stringify(graph).includes('do-not-copy'));
 });
+test('runtime inventory preserves short and long Compose syntax with provenance',()=>{
+ const graph={nodes:[],edges:[]};
+ const evidence={path:'compose.yaml',commitSha:'b'.repeat(40)};
+ addComposeServices(graph,`services:
+  api:
+    ports:
+      - 3000
+      - '8080:8000'
+      - {host_ip: '127.0.0.1', published: 9000, target: 8000, protocol: tcp}
+    networks: {internal: {}}
+    volumes:
+      - 'uploads:/data'
+      - {type: bind, source: './config', target: '/etc/app', read_only: true}
+    healthcheck: {test: ['CMD', 'true']}
+networks: {internal: {internal: true}}
+`,evidence);
+ const runtime=graph.runtime.services[0];
+ assert.deepEqual(runtime.ports,['3000','8080:8000','127.0.0.1:9000:8000/tcp']);
+ assert.deepEqual(runtime.networks,['internal']);
+ assert.deepEqual(runtime.volumes,['uploads:/data','./config:/etc/app:ro']);
+ assert.equal(runtime.healthcheck,true);
+ assert.deepEqual(runtime.evidence,evidence);
+ assert.deepEqual(graph.runtime.networks,['internal']);
+});

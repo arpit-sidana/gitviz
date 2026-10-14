@@ -14,7 +14,7 @@ This prototype provides three offline demo projects: [Cal.diy (formerly the Cal.
 
 - **Overview:** product capabilities and entry points.
 - **Product Flow:** numbered journeys through implementation components.
-- **Architecture:** labeled connections, logical boundaries, repository Compose services, zoom, source inspection, and explicitly marked deployment assumptions.
+- **Architecture:** an interactive, two-zone AWS reference design with public/private/isolated subnets, ALB, zonal NAT, route tables, API/worker boundaries, database failover, Redis, object storage and operations. Filter request, data, egress and operations paths; inspect connection protocols and security policies. Separate views preserve repository components and actual Compose configuration.
 - **Evolution:** feature themes in the Product view; linked PRs, diffs, file counts, and plain-English summaries in the Git view.
 - **Sources & limits:** pinned source locations and honest coverage limitations.
 
@@ -25,6 +25,8 @@ Choose **Summary**, **How it works**, or **Source files** to control the informa
 The previous illustrative commit IDs and history have been replaced with snapshots captured from GitHub. The source tree verifies file paths. PR dates and change counts come from the public API. Product labels, architecture connections, and feature groupings are curated interpretations; they are not a runtime trace or a complete call graph. Merge dates are not launch dates. No measured evaluation pass rate is claimed.
 
 Snapshots live in `lib/snapshots/demos.json`. `scripts/refresh-demos.mjs` retrieves public metadata and selected deployment configuration at build time. Browsing the demos requires no GitHub credentials or model inference. The original prototype data in `lib/demo-data.ts` is used only as a curation seed, not served to visitors.
+
+The AWS network is a repository-adapted **deployment proposal**, not a discovery of the projects’ production infrastructure. Cloud placement, CIDRs, protocols, security rules and high-availability choices are explicitly proposed. Inspect a resource to distinguish pinned repository facts from design assumptions. This is explanatory architecture, not deployable infrastructure configuration.
 
 ## Development and deployment
 

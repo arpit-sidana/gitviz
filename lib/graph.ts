@@ -16,6 +16,8 @@ export type GraphNode = {
   evidence: Evidence[];
   basis?: 'repository' | 'assumption';
   zone?: 'clients' | 'application' | 'data' | 'external';
+  architectureDetails?: { label: string; value: string; basis: 'repository' | 'proposal' }[];
+  references?: { label: string; url: string }[];
 };
 
 export type GraphEdge = {
@@ -77,5 +79,9 @@ export type RepositoryGraph = {
   capabilities: Capability[];
   evolution: EvolutionEvent[];
   evaluations: Evaluation[];
+  runtime?: {
+    services: { name: string; image?: string; ports: string[]; networks: string[]; volumes: string[]; profiles: string[]; dependencies: string[]; healthcheck: boolean; evidence: Evidence }[];
+    networks: string[];
+  };
 };
 

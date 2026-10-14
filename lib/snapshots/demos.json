@@ -420,7 +420,75 @@
         ]
       }
     ],
-    "evaluations": []
+    "evaluations": [],
+    "runtime": {
+      "services": [
+        {
+          "name": "database",
+          "image": "postgres",
+          "ports": [],
+          "networks": [
+            "stack"
+          ],
+          "volumes": [
+            "database-data:/var/lib/postgresql"
+          ],
+          "profiles": [],
+          "dependencies": [],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "redis",
+          "image": "redis:latest",
+          "ports": [
+            "${REDIS_PORT:-6379}:6379"
+          ],
+          "networks": [
+            "stack"
+          ],
+          "volumes": [
+            "redis-data:/data"
+          ],
+          "profiles": [],
+          "dependencies": [],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "calcom",
+          "image": "calcom.docker.scarf.sh/calcom/cal.diy",
+          "ports": [
+            "3000:3000"
+          ],
+          "networks": [
+            "stack"
+          ],
+          "volumes": [],
+          "profiles": [],
+          "dependencies": [
+            "database"
+          ],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Repository-provided deployment configuration."
+          }
+        }
+      ],
+      "networks": [
+        "stack"
+      ]
+    }
   },
   {
     "schemaVersion": "0.2",
@@ -1627,6 +1695,306 @@
         ]
       }
     ],
-    "evaluations": []
+    "evaluations": [],
+    "runtime": {
+      "services": [
+        {
+          "name": "api",
+          "image": "langgenius/dify-api:1.17.1",
+          "ports": [],
+          "networks": [
+            "ssrf_proxy_network",
+            "default"
+          ],
+          "volumes": [
+            "./volumes/app/storage:/app/api/storage"
+          ],
+          "profiles": [],
+          "dependencies": [
+            "init_permissions",
+            "db_postgres",
+            "db_mysql",
+            "oceanbase",
+            "seekdb",
+            "redis",
+            "agent_backend"
+          ],
+          "healthcheck": true,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "worker",
+          "image": "langgenius/dify-api:1.17.1",
+          "ports": [],
+          "networks": [
+            "ssrf_proxy_network",
+            "default"
+          ],
+          "volumes": [
+            "./volumes/app/storage:/app/api/storage"
+          ],
+          "profiles": [],
+          "dependencies": [
+            "init_permissions",
+            "db_postgres",
+            "db_mysql",
+            "oceanbase",
+            "seekdb",
+            "redis",
+            "agent_backend"
+          ],
+          "healthcheck": true,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "worker_beat",
+          "image": "langgenius/dify-api:1.17.1",
+          "ports": [],
+          "networks": [
+            "ssrf_proxy_network",
+            "default"
+          ],
+          "volumes": [],
+          "profiles": [],
+          "dependencies": [
+            "init_permissions",
+            "db_postgres",
+            "db_mysql",
+            "oceanbase",
+            "seekdb",
+            "redis"
+          ],
+          "healthcheck": true,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "web",
+          "image": "langgenius/dify-web:1.17.1",
+          "ports": [],
+          "networks": [],
+          "volumes": [],
+          "profiles": [],
+          "dependencies": [],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "db_postgres",
+          "image": "postgres:15-alpine",
+          "ports": [],
+          "networks": [],
+          "volumes": [
+            "./volumes/db/data:/var/lib/postgresql/data"
+          ],
+          "profiles": [
+            "postgresql"
+          ],
+          "dependencies": [],
+          "healthcheck": true,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "db_mysql",
+          "image": "mysql:8.0",
+          "ports": [],
+          "networks": [],
+          "volumes": [
+            "${MYSQL_HOST_VOLUME:-./volumes/mysql/data}:/var/lib/mysql"
+          ],
+          "profiles": [
+            "mysql"
+          ],
+          "dependencies": [],
+          "healthcheck": true,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "redis",
+          "image": "redis:6-alpine",
+          "ports": [],
+          "networks": [],
+          "volumes": [
+            "./volumes/redis/data:/data"
+          ],
+          "profiles": [],
+          "dependencies": [],
+          "healthcheck": true,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "sandbox",
+          "image": "langgenius/dify-sandbox:0.2.15",
+          "ports": [],
+          "networks": [
+            "ssrf_proxy_network"
+          ],
+          "volumes": [
+            "./volumes/sandbox/dependencies:/dependencies",
+            "./volumes/sandbox/conf:/conf"
+          ],
+          "profiles": [],
+          "dependencies": [],
+          "healthcheck": true,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "plugin_daemon",
+          "image": "langgenius/dify-plugin-daemon:0.6.10-local",
+          "ports": [
+            "${EXPOSE_PLUGIN_DEBUGGING_PORT:-5003}:${PLUGIN_DEBUGGING_PORT:-5003}"
+          ],
+          "networks": [
+            "ssrf_proxy_network",
+            "default"
+          ],
+          "volumes": [
+            "./volumes/plugin_daemon:/app/storage"
+          ],
+          "profiles": [],
+          "dependencies": [
+            "db_postgres",
+            "db_mysql",
+            "oceanbase",
+            "seekdb"
+          ],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "ssrf_proxy",
+          "image": "ubuntu/squid:latest",
+          "ports": [],
+          "networks": [
+            "ssrf_proxy_network",
+            "default"
+          ],
+          "volumes": [
+            "./ssrf_proxy/squid.conf.template:/etc/squid/squid.conf.template",
+            "./ssrf_proxy/squid-common.conf.template:/etc/squid/dify_common.conf.template",
+            "./ssrf_proxy/docker-entrypoint.sh:/docker-entrypoint-mount.sh"
+          ],
+          "profiles": [],
+          "dependencies": [],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "nginx",
+          "image": "nginx:latest",
+          "ports": [
+            "${EXPOSE_NGINX_PORT:-80}:${NGINX_PORT:-80}",
+            "${EXPOSE_NGINX_SSL_PORT:-443}:${NGINX_SSL_PORT:-443}"
+          ],
+          "networks": [],
+          "volumes": [
+            "./nginx/nginx.conf.template:/etc/nginx/nginx.conf.template",
+            "./nginx/proxy.conf.template:/etc/nginx/proxy.conf.template",
+            "./nginx/https.conf.template:/etc/nginx/https.conf.template",
+            "./nginx/conf.d:/etc/nginx/conf.d",
+            "./nginx/docker-entrypoint.sh:/docker-entrypoint-mount.sh",
+            "./nginx/ssl:/etc/ssl",
+            "./volumes/certbot/conf/live:/etc/letsencrypt/live",
+            "./volumes/certbot/conf:/etc/letsencrypt",
+            "./volumes/certbot/www:/var/www/html"
+          ],
+          "profiles": [],
+          "dependencies": [
+            "api",
+            "web"
+          ],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "weaviate",
+          "image": "cr.weaviate.io/semitechnologies/weaviate:1.39.2",
+          "ports": [],
+          "networks": [],
+          "volumes": [
+            "./volumes/weaviate:/var/lib/weaviate"
+          ],
+          "profiles": [
+            "weaviate"
+          ],
+          "dependencies": [],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        },
+        {
+          "name": "qdrant",
+          "image": "langgenius/qdrant:v1.8.3",
+          "ports": [],
+          "networks": [],
+          "volumes": [
+            "./volumes/qdrant:/qdrant/storage"
+          ],
+          "profiles": [
+            "qdrant"
+          ],
+          "dependencies": [],
+          "healthcheck": false,
+          "evidence": {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        }
+      ],
+      "networks": [
+        "ssrf_proxy_network",
+        "local_sandbox_proxy_network",
+        "agent_sandbox_network",
+        "milvus",
+        "opensearch-net"
+      ]
+    }
   }
 ]

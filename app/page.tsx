@@ -5,6 +5,8 @@ import type { FormEvent } from 'react';
 import snapshots from '@/lib/snapshots/demos.json';
 import type { Depth, GraphNode, RepositoryGraph, Tab } from '@/lib/graph';
 import { normalizeRepositoryUrl } from '@/lib/repository-url';
+import { ArchitectureExplorer } from '@/components/architecture-explorer';
+import { EvidencePanel } from '@/components/evidence-panel';
 
 const demos = snapshots as RepositoryGraph[];
 const tabs: { id: Tab; label: string; question: string }[] = [
@@ -61,10 +63,10 @@ export default function Home() {
     <section className={`content-grid ${tab === 'architecture' ? 'wide-map' : ''}`}><div className="main-panel">
       {tab === 'overview' && <Overview graph={graph} onCapability={id => { setCapId(id); setTab('flow'); setSelected(null); }}/ >}
       {tab === 'flow' && <Flow graph={graph} capId={cap.id} setCapId={id => {setCapId(id);setSelected(null);}} onNode={setSelected} depth={depth}/>}
-      {tab === 'architecture' && <Architecture key={graph.repository.name} graph={graph} onNode={setSelected} selectedId={selected?.id} depth={depth}/>}
+      {tab === 'architecture' && <ArchitectureExplorer key={graph.repository.name} graph={graph} onNode={setSelected} onClear={()=>setSelected(null)} selectedId={selected?.id} depth={depth} application={<Architecture graph={graph} onNode={setSelected} selectedId={selected?.id} depth={depth}/>}/>}
       {tab === 'evolution' && <Evolution key={graph.repository.name} graph={graph} depth={depth}/>}
       {tab === 'evaluation' && <Sources graph={graph} onNode={setSelected}/>}
-    </div><aside className="evidence-panel" aria-label="Selected component details"><div className="panel-heading"><span>Component details</span>{selected && <button onClick={() => setSelected(null)} aria-label="Close component details">×</button>}</div>{selected ? <><span className={`basis ${selected.basis === 'assumption' ? 'assumption' : ''}`}>{selected.basis === 'assumption' ? 'Surrounding architecture · assumption' : 'In repository · verified file'}</span><h2>{selected.label}</h2><p>{selected.detail}</p><div className="confidence"><span>Confidence</span><strong>{selected.basis === 'assumption' ? 'Unverified assumption' : 'Curated interpretation'}</strong></div>{selected.evidence.map(item => <article className="evidence-card" key={item.path}><a href={fileUrl(graph,item.path,item.commitSha)} target="_blank" rel="noreferrer"><code>{item.path}</code> ↗</a><p>{item.note}</p><small>Revision {item.commitSha.slice(0,7)}</small></article>)}{!selected.evidence.length && <p>No source file supports this component. It illustrates one possible deployment; your installation may differ.</p>}<p className="muted">Verified source locations do not prove runtime behavior or an installed production topology.</p></> : <div className="empty-evidence"><span aria-hidden="true">⌁</span><p>Select a component to see what it does, its confidence, and the source files behind it.</p></div>}</aside></section>
+    </div><EvidencePanel graph={graph} selected={selected} close={()=>setSelected(null)}/></section>
     <footer><span>GitViz · Work in progress</span><span>Offline demos · Sources captured {date(graph.repository.snapshotDate!)}</span></footer>
   </main>;
 }
