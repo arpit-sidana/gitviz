@@ -28,7 +28,7 @@ Snapshots live in `lib/snapshots/demos.json`. `scripts/refresh-demos.mjs` retrie
 
 ## Development and deployment
 
-Requires Node 24 and npm.
+Uses Node 24.13.0 (see `.nvmrc`) and its bundled npm 11.6.2 so local and GitHub installations resolve the lockfile consistently.
 
 ```sh
 npm ci
