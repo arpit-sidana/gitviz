@@ -1,147 +1,103 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
-import { demos } from '@/lib/demo-data';
-import type { Depth, GraphNode, Tab } from '@/lib/graph';
+import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
+import snapshots from '@/lib/snapshots/demos.json';
+import type { Depth, GraphNode, RepositoryGraph, Tab } from '@/lib/graph';
+import { normalizeRepositoryUrl } from '@/lib/repository-url';
 
+const demos = snapshots as RepositoryGraph[];
 const tabs: { id: Tab; label: string; question: string }[] = [
-  { id: 'overview', label: 'Overview', question: 'What is this?' },
-  { id: 'flow', label: 'Product Flow', question: 'How does it work?' },
-  { id: 'architecture', label: 'Architecture', question: 'What connects?' },
-  { id: 'evolution', label: 'Evolution', question: 'What changed?' },
-  { id: 'evaluation', label: 'Evaluation', question: 'Can I trust it?' },
+  { id: 'overview', label: 'Overview', question: 'What does the product do?' },
+  { id: 'flow', label: 'Product Flow', question: 'Follow a user journey' },
+  { id: 'architecture', label: 'Architecture', question: 'Explore the system' },
+  { id: 'evolution', label: 'Evolution', question: 'Features and pull requests' },
+  { id: 'evaluation', label: 'Sources & limits', question: 'What supports this map?' },
 ];
+const details: { id: Depth; label: string; help: string }[] = [
+  { id: 'orientation', label: 'Summary', help: 'Shows the product story and component names. Click any component to see its sources.' },
+  { id: 'trace', label: 'How it works', help: 'Adds each component’s role and the handoffs between them.' },
+  { id: 'inspect', label: 'Source files', help: 'Adds source paths, pinned revisions, and PR file details for a closer look.' },
+];
+const typeName = (node: GraphNode) => node.type.replaceAll('_', ' ').toLowerCase();
+const fileUrl = (graph: RepositoryGraph, path: string, sha = graph.repository.commitSha) => `${graph.repository.url}/blob/${sha}/${path.split('/').map(encodeURIComponent).join('/')}`;
+const date = (value: string) => new Date(value).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
 
-const depthCopy: Record<Depth, string> = {
-  orientation: 'Purpose and major capabilities',
-  trace: 'End-to-end implementation paths',
-  inspect: 'Files, lines, commits, and provenance',
-};
-
-const nodeTone: Record<GraphNode['type'], string> = {
-  UI_SURFACE: 'violet', ENDPOINT: 'blue', SERVICE: 'lime', DATA_STORE: 'orange',
-  JOB: 'pink', EXTERNAL_DEPENDENCY: 'cyan', FEATURE: 'yellow',
-};
+function ThemeToggle() {
+  const [theme, setTheme] = useState('light');
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const sync = () => { let saved: string | null = null; try { saved = localStorage.getItem('gitviz-theme'); } catch {} const value = saved === 'dark' || saved === 'light' ? saved : media.matches ? 'dark' : 'light'; setTheme(value); document.documentElement.dataset.theme = value; };
+    sync(); media.addEventListener('change', sync); return () => media.removeEventListener('change', sync);
+  }, []);
+  const toggle = () => { const value = theme === 'light' ? 'dark' : 'light'; setTheme(value); document.documentElement.dataset.theme = value; try { localStorage.setItem('gitviz-theme', value); } catch {} };
+  return <button className="theme-toggle" aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`} aria-pressed={theme === 'dark'} onClick={toggle}><span aria-hidden="true">{theme === 'light' ? '☾' : '☀'}</span><span>{theme === 'light' ? 'Dark' : 'Light'}</span></button>;
+}
 
 export default function Home() {
   const [repoIndex, setRepoIndex] = useState(0);
   const [tab, setTab] = useState<Tab>('overview');
-  const [depth, setDepth] = useState<Depth>('orientation');
-  const [capabilityId, setCapabilityId] = useState(demos[0].capabilities[0].id);
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [depth, setDepth] = useState<Depth>('trace');
+  const [capId, setCapId] = useState(demos[0].capabilities[0].id);
+  const [selected, setSelected] = useState<GraphNode | null>(null);
   const [repoUrl, setRepoUrl] = useState('');
   const [message, setMessage] = useState('');
   const graph = demos[repoIndex];
-  const capability = graph.capabilities.find((item) => item.id === capabilityId) ?? graph.capabilities[0];
-  const visibleNodes = useMemo(() => {
-    if (tab === 'architecture') return graph.nodes;
-    return capability.nodeIds.map((id) => graph.nodes.find((node) => node.id === id)).filter(Boolean) as GraphNode[];
-  }, [capability, graph, tab]);
-  const selectedNode = graph.nodes.find((node) => node.id === selectedNodeId) ?? null;
-
-  const selectRepo = (index: number) => {
-    setRepoIndex(index); setCapabilityId(demos[index].capabilities[0].id);
-    setSelectedNodeId(null); setTab('overview'); setMessage('');
-  };
-
+  const cap = graph.capabilities.find(c => c.id === capId) ?? graph.capabilities[0];
+  const selectRepo = (index: number) => { setRepoIndex(index); setCapId(demos[index].capabilities[0].id); setSelected(null); setMessage(''); };
   const submitRepo = (event: FormEvent) => {
-    event.preventDefault();
-    const index = demos.findIndex((demo) => repoUrl.replace(/\/$/, '').toLowerCase() === demo.repository.url.toLowerCase());
-    if (index >= 0) { selectRepo(index); setMessage('Loaded the precomputed evidence snapshot.'); }
-    else setMessage('Live ingestion is not enabled yet. Choose one of the three evidence-backed demos.');
+    event.preventDefault(); const url = normalizeRepositoryUrl(repoUrl);
+    if (!url) { setMessage('Enter a repository URL such as https://github.com/saleor/saleor.'); return; }
+    const canonical = url === 'https://github.com/calcom/cal.com' ? 'https://github.com/calcom/cal.diy' : url;
+    const index = demos.findIndex(d => d.repository.url.toLowerCase() === canonical);
+    if (index >= 0) { selectRepo(index); setMessage('Demo loaded. This is a saved, curated snapshot.'); }
+    else setMessage('Live ingestion is still in development. Explore one of the three demo projects below.');
   };
-
-  return (
-    <main className="app-shell">
-      <header className="app-header">
-        <a className="brand" href="/">gitviz<span>.</span></a>
-        <form className="repo-search" onSubmit={submitRepo}>
-          <span aria-hidden="true">⌘</span>
-          <input value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} aria-label="Public GitHub repository URL" placeholder="Paste a public GitHub URL" />
-          <button type="submit">Analyze</button>
-        </form>
-        <a className="github-link" href="https://github.com/arpit-sidana/gitviz">GitHub ↗</a>
-      </header>
-
-      {message && <div className="notice" role="status">{message}</div>}
-
-      <section className="workspace-head">
-        <div>
-          <div className="repo-switcher" aria-label="Demo repository">
-            {demos.map((demo, index) => <button key={demo.repository.name} className={repoIndex === index ? 'active' : ''} onClick={() => selectRepo(index)}>{demo.repository.name}</button>)}
-          </div>
-          <p className="repo-path">github.com / {graph.repository.owner} / <strong>{graph.repository.name}</strong></p>
-          <h1>{graph.repository.purpose}</h1>
-          <div className="repo-meta"><span className="status-dot" /> Precomputed snapshot <span>·</span> {graph.repository.languages.join(' / ')} <span>·</span> {graph.nodes.length} nodes</div>
-        </div>
-        <div className="depth-control">
-          <span className="control-label">DEPTH</span>
-          <div className="segmented">{(['orientation','trace','inspect'] as Depth[]).map((item) => <button key={item} className={depth === item ? 'active' : ''} onClick={() => setDepth(item)}>{item[0].toUpperCase() + item.slice(1)}</button>)}</div>
-          <small>{depthCopy[depth]}</small>
-        </div>
-      </section>
-
-      <nav className="tabs" aria-label="Repository views">{tabs.map((item) => <button key={item.id} className={tab === item.id ? 'active' : ''} onClick={() => { setTab(item.id); setSelectedNodeId(null); }}><strong>{item.label}</strong><small>{item.question}</small></button>)}</nav>
-
-      <section className="content-grid">
-        <div className="main-panel">
-          {tab === 'overview' && <Overview graph={graph} onCapability={(id) => { setCapabilityId(id); setTab('flow'); }} depth={depth} />}
-          {tab === 'flow' && <Flow graph={graph} capabilityId={capability.id} setCapabilityId={setCapabilityId} nodes={visibleNodes} onNode={setSelectedNodeId} depth={depth} />}
-          {tab === 'architecture' && <Architecture graph={graph} onNode={setSelectedNodeId} selectedNodeId={selectedNodeId} depth={depth} />}
-          {tab === 'evolution' && <Evolution graph={graph} depth={depth} />}
-          {tab === 'evaluation' && <Evaluation graph={graph} onNode={setSelectedNodeId} depth={depth} />}
-        </div>
-        <aside className="evidence-panel">
-          <div className="panel-heading"><span>Evidence</span><span className="evidence-count">{selectedNode?.evidence.length ?? 0}</span></div>
-          {selectedNode ? <>
-            <span className={`type-pill ${nodeTone[selectedNode.type]}`}>{selectedNode.type.replaceAll('_',' ')}</span>
-            <h2>{selectedNode.label}</h2><p>{selectedNode.detail}</p>
-            {selectedNode.evidence.map((item) => <article className="evidence-card" key={item.path}>
-              <div className="file-icon">F</div><div><code>{item.path}</code>{item.lines && <small>Lines {item.lines}</small>}<p>{item.note}</p><span>Commit {item.commitSha.slice(0,12)}</span></div>
-            </article>)}
-            <div className="confidence"><span>Derivation</span><strong>Deterministic</strong><span>Confidence</span><strong>High</strong></div>
-          </> : <div className="empty-evidence"><span>⌁</span><p>Select a component or evaluation result to inspect its source evidence.</p></div>}
-        </aside>
-      </section>
-      <footer><span>Schema v{graph.schemaVersion}</span><span>Evidence-backed · No runtime tracing · Work in progress</span></footer>
-    </main>
-  );
+  return <main className="app-shell">
+    <header className="app-header"><a className="brand" href="./">gitviz<span>.</span></a><form className="repo-search" onSubmit={submitRepo}><input value={repoUrl} onChange={e => setRepoUrl(e.target.value)} aria-label="GitHub repository URL" placeholder="Open a demo by GitHub URL"/><button>Open</button></form><div className="header-actions"><a href="https://github.com/arpit-sidana/gitviz" target="_blank" rel="noreferrer">GitViz repo ↗</a><ThemeToggle/></div></header>
+    {message && <div className="notice" role="status">{message}</div>}
+    <section className="workspace-head"><div className="repo-intro"><p className="eyebrow">THREE DEMO PROJECTS <span>· Live ingestion coming later</span></p><div className="repo-switcher" aria-label="Demo projects">{demos.map((demo, index) => <div className={`demo-choice ${index === repoIndex ? 'active' : ''}`} key={demo.repository.name}><button aria-pressed={index === repoIndex} onClick={() => selectRepo(index)}>{demo.repository.name.startsWith('cal.') ? 'Cal.com / Cal.diy' : demo.repository.name === 'dify' ? 'Dify' : 'Saleor'}</button><a href={demo.repository.url} aria-label={`Open ${demo.repository.name} on GitHub`} target="_blank" rel="noreferrer">↗</a></div>)}</div><a className="repo-path" href={graph.repository.url} target="_blank" rel="noreferrer">{graph.repository.owner}/{graph.repository.name} ↗</a><h1>{graph.repository.purpose}</h1><div className="repo-meta">Curated demo <span>·</span> {graph.repository.languages.join(' / ')} <span>·</span><a href={`${graph.repository.url}/tree/${graph.repository.commitSha}`} target="_blank" rel="noreferrer">Source revision {graph.repository.commitSha.slice(0,7)} ↗</a></div></div><div className="depth-control"><span className="control-label">AMOUNT OF DETAIL</span><div className="segmented">{details.map(item => <button key={item.id} aria-pressed={depth === item.id} className={depth === item.id ? 'active' : ''} onClick={() => setDepth(item.id)}>{item.label}</button>)}</div><p>{details.find(d => d.id === depth)?.help}</p></div></section>
+    <nav className="tabs" aria-label="Repository views">{tabs.map(item => <button key={item.id} aria-current={tab === item.id ? 'page' : undefined} className={tab === item.id ? 'active' : ''} onClick={() => { setTab(item.id); setSelected(null); }}><strong>{item.label}</strong><small>{item.question}</small></button>)}</nav>
+    <section className={`content-grid ${tab === 'architecture' ? 'wide-map' : ''}`}><div className="main-panel">
+      {tab === 'overview' && <Overview graph={graph} onCapability={id => { setCapId(id); setTab('flow'); setSelected(null); }}/ >}
+      {tab === 'flow' && <Flow graph={graph} capId={cap.id} setCapId={id => {setCapId(id);setSelected(null);}} onNode={setSelected} depth={depth}/>}
+      {tab === 'architecture' && <Architecture key={graph.repository.name} graph={graph} onNode={setSelected} selectedId={selected?.id} depth={depth}/>}
+      {tab === 'evolution' && <Evolution key={graph.repository.name} graph={graph} depth={depth}/>}
+      {tab === 'evaluation' && <Sources graph={graph} onNode={setSelected}/>}
+    </div><aside className="evidence-panel" aria-label="Selected component details"><div className="panel-heading"><span>Component details</span>{selected && <button onClick={() => setSelected(null)} aria-label="Close component details">×</button>}</div>{selected ? <><span className={`basis ${selected.basis === 'assumption' ? 'assumption' : ''}`}>{selected.basis === 'assumption' ? 'Surrounding architecture · assumption' : 'In repository · verified file'}</span><h2>{selected.label}</h2><p>{selected.detail}</p><div className="confidence"><span>Confidence</span><strong>{selected.basis === 'assumption' ? 'Unverified assumption' : 'Curated interpretation'}</strong></div>{selected.evidence.map(item => <article className="evidence-card" key={item.path}><a href={fileUrl(graph,item.path,item.commitSha)} target="_blank" rel="noreferrer"><code>{item.path}</code> ↗</a><p>{item.note}</p><small>Revision {item.commitSha.slice(0,7)}</small></article>)}{!selected.evidence.length && <p>No source file supports this component. It illustrates one possible deployment; your installation may differ.</p>}<p className="muted">Verified source locations do not prove runtime behavior or an installed production topology.</p></> : <div className="empty-evidence"><span aria-hidden="true">⌁</span><p>Select a component to see what it does, its confidence, and the source files behind it.</p></div>}</aside></section>
+    <footer><span>GitViz · Work in progress</span><span>Offline demos · Sources captured {date(graph.repository.snapshotDate!)}</span></footer>
+  </main>;
 }
 
-function Overview({ graph, onCapability, depth }: { graph: (typeof demos)[number]; onCapability: (id:string)=>void; depth:Depth }) {
-  return <div className="view"><div className="view-title"><p>REPOSITORY ORIENTATION</p><h2>Start with what the product does.</h2><span>The graph stays underneath until you choose to go deeper.</span></div>
-    <div className="metric-row"><div><strong>{graph.capabilities.length}</strong><span>capabilities</span></div><div><strong>{graph.nodes.length}</strong><span>components</span></div><div><strong>{graph.edges.length}</strong><span>relationships</span></div><div><strong>{graph.evaluations.filter(e=>e.status==='passed').length}/4</strong><span>checks passed</span></div></div>
-    <h3>Primary capabilities</h3><div className="capability-grid">{graph.capabilities.map((item,index)=><button key={item.id} onClick={()=>onCapability(item.id)}><span>0{index+1}</span><strong>{item.name}</strong><p>{item.summary}</p><em>Trace capability →</em></button>)}</div>
-    {depth !== 'orientation' && <section className="analysis-note"><strong>Analysis coverage</strong><p>{graph.repository.limitations.join(' ')}</p></section>}
-  </div>;
+function Title({label,title,children}:{label:string;title:string;children:React.ReactNode}) { return <div className="view-title"><p>{label}</p><h2>{title}</h2><div>{children}</div></div>; }
+function Overview({graph,onCapability}:{graph:RepositoryGraph;onCapability:(id:string)=>void}) {
+ return <div className="view"><Title label="PRODUCT OVERVIEW" title="Start with what people can do.">Choose a capability to follow the implementation. These are curated examples of the product’s core journeys.</Title><div className="metric-row"><div><strong>{graph.capabilities.length}</strong><span>product capabilities</span></div><div><strong>{graph.nodes.length}</strong><span>mapped components</span></div><div><strong>{graph.edges.length}</strong><span>interpreted connections</span></div></div><h3>Primary capabilities</h3><div className="capability-grid">{graph.capabilities.map((c,i)=><button key={c.id} onClick={()=>onCapability(c.id)}><span>0{i+1}</span><strong>{c.name}</strong><p>{c.summary}</p><em>Follow this flow →</em></button>)}</div><section className="analysis-note"><strong>About this demo</strong><p>Source locations are pinned to a real repository revision. Product labels and connections are curated interpretations. This is a sample map, not exhaustive repository analysis.</p></section></div>;
+}
+function Flow({graph,capId,setCapId,onNode,depth}:{graph:RepositoryGraph;capId:string;setCapId:(id:string)=>void;onNode:(n:GraphNode)=>void;depth:Depth}) {
+ const cap=graph.capabilities.find(c=>c.id===capId)!;
+ return <div className="view"><Title label="PRODUCT FLOW" title={cap.name}>{cap.summary}</Title><div className="cap-tabs">{graph.capabilities.map(c=><button key={c.id} aria-pressed={capId===c.id} className={capId===c.id?'active':''} onClick={()=>setCapId(c.id)}>{c.name}</button>)}</div><div className="flow-canvas">{cap.nodeIds.map((id,i)=>{const n=graph.nodes.find(node=>node.id===id)!;const prev=cap.nodeIds[i-1];const edge=graph.edges.find(e=>e.source===prev&&e.target===id);return <div className="flow-step" key={id}>{i>0&&<div className="connector"><span>{edge?edge.type.replaceAll('_',' ').toLowerCase():'journey step'}</span>→</div>}<button onClick={()=>onNode(n)}><span className={`node-mark tone-${n.type}`}>{i+1}</span><small>{typeName(n)}</small><strong>{n.label}</strong>{depth!=='orientation'&&<p>{n.detail}</p>}{depth==='inspect'&&<code>{n.evidence[0]?.path}</code>}</button></div>;})}</div><p className="canvas-caption">Numbered steps explain the journey. Connections are curated; selecting a box opens its pinned source.</p></div>;
 }
 
-function Flow({ graph, capabilityId, setCapabilityId, nodes, onNode, depth }: { graph:(typeof demos)[number]; capabilityId:string; setCapabilityId:(id:string)=>void; nodes:GraphNode[]; onNode:(id:string)=>void; depth:Depth }) {
-  const cap=graph.capabilities.find(c=>c.id===capabilityId)!;
-  return <div className="view"><div className="view-title"><p>PRODUCT FLOW</p><h2>{cap.name}</h2><span>{cap.summary}</span></div>
-    <div className="cap-tabs">{graph.capabilities.map(c=><button className={c.id===capabilityId?'active':''} key={c.id} onClick={()=>setCapabilityId(c.id)}>{c.name}</button>)}</div>
-    <div className="flow-canvas">{nodes.map((node,index)=><div className="flow-step" key={node.id}>{index>0&&<span className="connector">→</span>}<button onClick={()=>onNode(node.id)}><span className={`node-mark ${nodeTone[node.type]}`}>{index+1}</span><small>{node.type.replaceAll('_',' ')}</small><strong>{node.label}</strong>{depth!=='orientation'&&<p>{node.detail}</p>}{depth==='inspect'&&<code>{node.evidence[0]?.path}</code>}</button></div>)}</div>
-    <p className="canvas-caption">Select any component to inspect the evidence behind this path.</p>
-  </div>;
+function Architecture({graph,onNode,selectedId,depth}:{graph:RepositoryGraph;onNode:(n:GraphNode)=>void;selectedId?:string;depth:Depth}) {
+ const [context,setContext]=useState(true); const [zoom,setZoom]=useState(1);
+ const [layer,setLayer]=useState('all');
+ const zone=(n:GraphNode)=>n.zone??(n.type==='UI_SURFACE'?'clients':n.type==='DATA_STORE'?'data':n.type==='EXTERNAL_DEPENDENCY'?'external':'application');
+ const assumptions:GraphNode[]=[{id:'context-client',type:'UI_SURFACE',label:'Browser / API consumer',detail:'A consumer of the application API. Saleor’s storefront and dashboard are separate projects; other demos include UI code. This node provides the consumer context.',basis:'assumption',zone:'clients',evidence:[]},{id:'context-ingress',type:'SERVICE',label:'TLS ingress / reverse proxy',detail:'Reference deployment assumption: an ingress terminates HTTPS and forwards requests. No AWS service, cloud account, VPC, or public endpoint is established by this map.',basis:'assumption',zone:'clients',evidence:[]}];
+ const layerNodes=graph.nodes.filter(n=>layer==='all'||(layer==='deployment'?(n.id.startsWith('compose-')||n.id==='deployment'):(!n.id.startsWith('compose-')&&n.id!=='deployment')));
+ const nodes=context?[...assumptions,...layerNodes]:layerNodes;
+ const zones=[{id:'clients',title:'Client & ingress',subtitle:'Entry into the application'},{id:'application',title:'Application boundary',subtitle:'Code and deployment examples'},{id:'data',title:'State & persistence',subtitle:'Logical models / storage boundaries'},{id:'external',title:'External systems',subtitle:'Providers outside the application'}];
+ const positions=new Map<string,{x:number;y:number}>(); let height=520;
+ zones.forEach((z,i)=>{const list=nodes.filter(n=>zone(n)===z.id);height=Math.max(height,list.length*152+110);list.forEach((n,j)=>positions.set(n.id,{x:i*290+24,y:100+j*152}));});
+ const target=layerNodes.find(n=>n.type==='ENDPOINT')??layerNodes.find(n=>n.type==='SERVICE');
+ const edges=[...graph.edges.map(e=>({...e,assumption:false})),...(context&&target?[{id:'client-ingress',source:'context-client',target:'context-ingress',type:'HTTPS',assumption:true},{id:'ingress-app',source:'context-ingress',target:target.id,type:'forwards · assumed',assumption:true}]:[])].filter(e=>positions.has(e.source)&&positions.has(e.target));
+ return <div className="view"><Title label="SYSTEM ARCHITECTURE" title="Follow the boundaries and handoffs.">Solid components have verified repository files. Dashed components illustrate surrounding infrastructure. Cloud-specific networking is unverified.</Title><div className="diagram-tools"><label>Layer <select aria-label="Architecture layer" value={layer} onChange={e=>setLayer(e.target.value)}><option value="all">Code + deployment</option><option value="code">Application code</option><option value="deployment">Deployment example</option></select></label><label><input type="checkbox" checked={context} onChange={e=>setContext(e.target.checked)}/> Show surrounding architecture assumptions</label><div><button onClick={()=>setZoom(z=>Math.max(.5,z-.15))} aria-label="Zoom out">−</button><button onClick={()=>setZoom(1)} aria-label="Reset zoom">{Math.round(zoom*100)}%</button><button onClick={()=>setZoom(z=>Math.min(2,z+.15))} aria-label="Zoom in">+</button></div></div><div className="diagram-scroll" tabIndex={0} aria-label="Scrollable architecture diagram"><svg role="group" aria-label={`${graph.repository.name} system architecture with labeled relationships`} width={1160*zoom} height={height*zoom} viewBox={`0 0 1160 ${height}`}><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="currentColor"/></marker></defs>{zones.map((z,i)=><g key={z.id}><rect x={i*290+8} y={10} width="274" height={height-24} rx="10" className="zone-bg"/><text x={i*290+24} y="42" className="zone-title">{z.title}</text><text x={i*290+24} y="63" className="zone-subtitle">{z.subtitle}</text></g>)}{edges.map((e,i)=>{const from=positions.get(e.source),to=positions.get(e.target);if(!from||!to)return null;const same=from.x===to.x;const x1=from.x+(same?114:to.x>from.x?234:0),y1=from.y+(same?116:58),x2=to.x+(same?114:to.x>from.x?0:234),y2=to.y+(same?0:58);const bend=same?`M${x1},${y1} L${x2},${y2}`:`M${x1},${y1} C${x1+(x2-x1)/2},${y1} ${x1+(x2-x1)/2},${y2} ${x2},${y2}`;return <g key={e.id} className={e.assumption?'assumed-edge':'repo-edge'}><path d={bend} markerEnd="url(#arrow)"/><text x={same?x1+6:(x1+x2)/2} y={same?(y1+y2)/2:(y1+y2)/2-8-(i%2)*12} textAnchor={same?'start':'middle'}>{e.type.replaceAll('_',' ').toLowerCase()}</text></g>;})}{nodes.map(n=>{const p=positions.get(n.id)!;return <g role="button" tabIndex={0} aria-label={`${n.label}, ${n.basis==='assumption'?'assumption':'repository component'}`} onClick={()=>onNode(n)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onNode(n);}}} key={n.id} transform={`translate(${p.x},${p.y})`} className={`diagram-node ${n.basis==='assumption'?'assumed-node':''} ${selectedId===n.id?'selected':''}`}><rect width="234" height="116" rx="7"/><text x="14" y="22" className="node-category">{n.basis==='assumption'?'ASSUMPTION':(n.detail.includes('Optional profile:')?'OPTIONAL CONFIGURATION':typeName(n).toUpperCase())}</text><text x="14" y="48" className="node-label">{n.label.length>28?n.label.slice(0,26)+'…':n.label}</text><text x="14" y="72" className="node-description">{depth==='orientation'?'Click for sources and role':n.detail.slice(0,33)}</text><text x="14" y="94" className="node-description">{depth==='inspect'?(n.evidence[0]?.path.split('/').pop()??'No repository evidence'):n.basis==='assumption'?'Reference deployment only':'Pinned repository source ↗'}</text></g>;})}</svg></div><section className="analysis-note"><strong>Deployment context</strong><p>Application and data boundaries here are logical. A VPC, subnets, load balancers, replicas, availability zones, and managed database instances depend on the installation. They are not inferred from application code.</p></section><details className="relationship-list"><summary>Read the {edges.length} connections as text</summary><ul>{edges.map(e=><li key={e.id}>{nodes.find(n=>n.id===e.source)?.label} → {e.type.replaceAll('_',' ').toLowerCase()} → {nodes.find(n=>n.id===e.target)?.label}{e.assumption?' (assumption)':' (curated interpretation)'}</li>)}</ul></details></div>;
 }
 
-function Architecture({ graph, onNode, selectedNodeId, depth }: { graph:(typeof demos)[number]; onNode:(id:string)=>void; selectedNodeId:string|null; depth:Depth }) {
-  const shown=depth==='orientation'?graph.nodes.slice(0,5):graph.nodes;
-  return <div className="view"><div className="view-title"><p>SYSTEM STRUCTURE</p><h2>Architecture map</h2><span>{shown.length} visible components · select a node for provenance</span></div>
-    <div className="legend">{Object.entries(nodeTone).map(([type,tone])=><span key={type}><i className={tone}/>{type.replaceAll('_',' ')}</span>)}</div>
-    <div className="arch-canvas"><div className="arch-lines" aria-hidden="true"/><div className="node-cloud">{shown.map((node,index)=><button style={{'--i':index} as React.CSSProperties} className={selectedNodeId===node.id?'selected':''} key={node.id} onClick={()=>onNode(node.id)}><span className={`node-mark ${nodeTone[node.type]}`}>{index+1}</span><strong>{node.label}</strong><small>{node.type.replaceAll('_',' ')}</small>{depth==='inspect'&&<code>{node.evidence[0]?.path.split('/').pop()}</code>}</button>)}</div></div>
-  </div>;
+function Evolution({graph,depth}:{graph:RepositoryGraph;depth:Depth}) {
+ const [lens,setLens]=useState<'product'|'git'>('product');
+ const groups=Array.from(new Set(graph.evolution.map(e=>e.group)));
+ return <div className="view"><Title label="PROJECT EVOLUTION" title="What changed, and why it matters.">A saved sample of merged pull requests. Dates show merges; release and rollout dates are not established.</Title><div className="cap-tabs"><button aria-pressed={lens==='product'} className={lens==='product'?'active':''} onClick={()=>setLens('product')}>Product view · feature themes</button><button aria-pressed={lens==='git'} className={lens==='git'?'active':''} onClick={()=>setLens('git')}>Git view · individual PRs</button></div><p className="muted">{graph.evolution.length} merged PRs in this sample. Feature groupings and value summaries are interpretations of PR titles; the linked PR is the source of truth.</p>{lens==='product'?<div className="product-timeline">{groups.map(group=>{const events=graph.evolution.filter(e=>e.group===group);return <article className="theme-card" key={group}><span className="eyebrow">FEATURE THEME · INFERRED GROUPING</span><h3>{group}</h3><p>{events.length} PR{events.length===1?'':'s'} · {date(events.at(-1)!.date)} – {date(events[0].date)}</p>{events.map(e=><div className="product-event" key={e.commitSha}><time dateTime={e.date}>{date(e.date)}</time><div><a href={e.prUrl} target="_blank" rel="noreferrer">#{e.prNumber} · {e.prTitle} ↗</a><p>{e.value}</p><a className="file-count" href={`${e.prUrl}/files`} target="_blank" rel="noreferrer">{e.files} files changed ↗</a><span className="rollout">Merged · rollout unverified</span></div></div>)}</article>;})}</div>:<div className="pr-list">{graph.evolution.map(e=><article className="pr-card" key={e.commitSha}><div className="pr-meta"><span>MERGED {date(e.date)}</span><a href={e.prUrl} target="_blank" rel="noreferrer">PR #{e.prNumber} ↗</a></div><h3>{e.prTitle}</h3><p>{e.value}</p><div className="change-stats"><a href={`${e.prUrl}/files`} target="_blank" rel="noreferrer">{e.files} files changed ↗</a><span>+{e.additions} / −{e.deletions}</span><a href={`${graph.repository.url}/commit/${e.commitSha}`} target="_blank" rel="noreferrer">Commit {e.commitSha.slice(0,7)} ↗</a></div><details open={depth==='inspect'}><summary>Changed files & author’s description</summary><p className="pr-description">{e.detail}</p><ul>{e.paths?.map(path=><li key={path}><a href={fileUrl(graph,path,e.commitSha)} target="_blank" rel="noreferrer"><code>{path}</code></a></li>)}</ul>{e.files>(e.paths?.length??0)&&<p>Showing the first {e.paths?.length} files; the PR has the complete diff.</p>}</details></article>)}</div>}</div>;
 }
-
-function Evolution({ graph, depth }: { graph:(typeof demos)[number]; depth:Depth }) {
-  return <div className="view"><div className="view-title"><p>HISTORICAL EVIDENCE</p><h2>How the project evolved</h2><span>Observed changes only. GitViz does not forecast what changes next.</span></div>
-    <div className="timeline">{graph.evolution.map((event,index)=><article key={event.commitSha}><div className="time-rail"><span>{event.date}</span><i/></div><div className="event-card"><span className="event-index">0{index+1}</span><div><h3>{event.title}</h3><p>{event.detail}</p><small>{event.files} files changed{depth==='inspect'&&` · commit ${event.commitSha}`}</small></div></div></article>)}</div>
-  </div>;
-}
-
-function Evaluation({ graph, onNode, depth }: { graph:(typeof demos)[number]; onNode:(id:string)=>void; depth:Depth }) {
-  return <div className="view"><div className="view-title"><p>KNOWN-ANSWER CHECKS</p><h2>Trust, made inspectable.</h2><span>These checks test whether GitViz can answer the specific comprehension job without guessing.</span></div>
-    <div className="eval-summary"><strong>{graph.evaluations.filter(e=>e.status==='passed').length} passed</strong><span>of {graph.evaluations.length} launch checks</span><div><i style={{width:`${graph.evaluations.filter(e=>e.status==='passed').length/graph.evaluations.length*100}%`}}/></div></div>
-    <div className="eval-list">{graph.evaluations.map((item,index)=><article key={item.question}><span className={`check ${item.status}`}>{item.status==='passed'?'✓':'!'}</span><div><small>CHECK 0{index+1}</small><h3>{item.question}</h3><p>{item.answer}</p>{depth!=='orientation'&&<div className="evidence-links">{item.evidenceIds.map(id=><button key={id} onClick={()=>onNode(id)}>{graph.nodes.find(n=>n.id===id)?.label} ↗</button>)}{!item.evidenceIds.length&&<span>No supporting runtime evidence</span>}</div>}</div></article>)}</div>
-  </div>;
+function Sources({graph,onNode}:{graph:RepositoryGraph;onNode:(n:GraphNode)=>void}) {
+ return <div className="view"><Title label="SOURCES & LIMITS" title="See what supports the explanation.">Original files, deployment examples, and pull requests behind this demo. Product interpretations are labeled so you can judge their support.</Title><section className="analysis-note"><strong>What was checked</strong><p>Each linked path exists in the pinned GitHub file tree. PR dates, counts, and commit IDs come from GitHub’s public API. Component roles and feature groupings are curated interpretations, and runtime behavior remains unverified.</p></section><div className="sources-list">{graph.nodes.map(node=><button key={node.id} onClick={()=>onNode(node)}><span>{node.label}</span><small>{node.evidence.length} verified source location{node.evidence.length===1?'':'s'} →</small></button>)}</div><h3>Known limitations</h3><ul className="limits">{graph.repository.limitations.map(limit=><li key={limit}>{limit}</li>)}</ul></div>;
 }

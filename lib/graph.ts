@@ -14,6 +14,8 @@ export type GraphNode = {
   label: string;
   detail: string;
   evidence: Evidence[];
+  basis?: 'repository' | 'assumption';
+  zone?: 'clients' | 'application' | 'data' | 'external';
 };
 
 export type GraphEdge = {
@@ -38,6 +40,14 @@ export type EvolutionEvent = {
   capabilityId: string;
   files: number;
   commitSha: string;
+  prUrl?: string;
+  prNumber?: number;
+  prTitle?: string;
+  value?: string;
+  group?: string;
+  additions?: number;
+  deletions?: number;
+  paths?: string[];
 };
 
 export type Evaluation = {
@@ -60,6 +70,7 @@ export type RepositoryGraph = {
     analysisTier: 'precomputed';
     languages: string[];
     limitations: string[];
+    snapshotDate?: string;
   };
   nodes: GraphNode[];
   edges: GraphEdge[];

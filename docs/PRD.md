@@ -1,10 +1,10 @@
 # GitViz Product Requirements Document
 
-- **Status:** Draft for discussion
+- **Status:** Locked MVP, with accepted product refinements
 - **Version:** 0.2
 - **Target:** Evidence-backed repository understanding prototype
 - **Product owner:** Arpit Sidana
-- **Last updated:** August 21, 2026
+- **Last updated:** October 14, 2026
 
 ## 1. Mission
 
@@ -45,11 +45,11 @@ GitViz is audience-neutral. Anyone who needs to understand an unfamiliar public 
 
 The user controls how much detail to see. A depth choice is a presentation setting across all tabs, not a persona or a separate interpretation of the repository:
 
-- **Orientation:** purpose, major capabilities, boundaries, coverage, and high-level evolution.
-- **Trace:** end-to-end capability flows and the components connected to them.
-- **Inspect:** files, symbols, lines, commits, relationships, provenance, and analysis limitations.
+- **Summary** (formerly Orientation): product story and component names; source details remain available on selection.
+- **How it works** (formerly Trace): component roles and implementation handoffs.
+- **Source files** (formerly Inspect): pinned paths, source revisions, and PR file details.
 
-Orientation is the default. Users can move between depths at any time; GitViz never assumes whether they are an executive, PM, engineer, or another kind of reader.
+How it works is the default. Each choice explains the information it adds. Users can move between levels at any time; GitViz never assumes whether they are an executive, PM, engineer, or another kind of reader.
 
 ## 4. Product vocabulary
 
@@ -404,3 +404,18 @@ If time is constrained, cut AI enrichment and external visualization integration
 | 2026-08-21 | Launch with Cal.com/Cal.diy, Saleor, and Dify | They provide understandable breadth across UI workflows, business APIs, and AI/infra-heavy visual systems |
 | 2026-08-22 | Replace persona/role framing with a user-controlled depth selector | The tabs should explain what they do while letting each reader choose how deeply to explore |
 | 2026-09-11 | Ship the interaction prototype with precomputed evidence snapshots before live ingestion | This validates the comprehension experience while deterministic analyzers are still being built |
+| 2026-10-14 | Publish the static demo app on GitHub Pages after tests, type checking, and export succeed in Actions | GitHub becomes the primary hosting and deployment workflow |
+| 2026-10-14 | Use Summary / How it works / Source files with contextual explanations | Original depth labels did not make their effect clear |
+| 2026-10-14 | Draw labeled architecture edges and logical boundaries; parse Compose services; distinguish assumptions | A component cloud does not explain system behavior or deployment context |
+| 2026-10-14 | Add Product and Git views to Evolution using real merged PRs | File counts must link to PR diffs; feature grouping and rollout uncertainty must be explicit |
+| 2026-10-14 | Replace the visible Evaluation score with Sources & limits | The earlier score was illustrative. Do not claim measured quality without an executed, independently curated evaluation |
+
+## 19. Accepted interaction refinements (October 2026)
+
+- Follow the browser’s color preference initially, fall back to light, and retain the user’s explicit theme toggle locally.
+- Clearly label the three demo projects, with direct links to their canonical repositories. GitHub currently redirects the original Cal.com URL to Cal.diy.
+- Keep Product Flow as a numbered box-based user journey. Architecture adds labeled directed connections, zoom, scrolling, keyboard selection, textual connections, and repository deployment examples.
+- Source-backed components link to pinned files. Surrounding deployment assumptions use dashed borders and explain that VPCs, subnets, availability zones, managed services, and production topology are not established by the repository snapshot.
+- Evolution’s Product view groups PRs into interpreted feature themes. Its Git view exposes individual PRs, plain-English value, exact diff counts, merge commits, and sampled changed files. Merge dates do not establish launch dates.
+- Offline snapshot curation verifies paths against a complete, pinned repository tree and fetches merged PR metadata. Curated relationships and feature summaries remain interpretations; file existence alone does not establish call behavior.
+- Internal evaluation goals remain part of the roadmap. The current demos expose source coverage and limits without a quality pass rate.

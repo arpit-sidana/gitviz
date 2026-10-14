@@ -1,0 +1,1632 @@
+[
+  {
+    "schemaVersion": "0.2",
+    "repository": {
+      "owner": "calcom",
+      "name": "cal.diy",
+      "url": "https://github.com/calcom/cal.diy",
+      "purpose": "Open scheduling infrastructure for individuals and teams.",
+      "defaultBranch": "main",
+      "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+      "analyzedAt": "2026-09-20T08:17:32Z",
+      "analysisTier": "precomputed",
+      "languages": [
+        "TypeScript",
+        "React",
+        "Next.js"
+      ],
+      "limitations": [
+        "Curated product interpretation; source paths verified against the pinned repository tree. Relationships are interpretations, not a complete call graph.",
+        "Recent merged PR sample only. Merge dates do not prove deployment or customer availability.",
+        "No live repository ingestion or runtime tracing. Dashed infrastructure nodes are explicit assumptions."
+      ],
+      "snapshotDate": "2026-10-14T23:17:56.229Z"
+    },
+    "capabilities": [
+      {
+        "id": "booking",
+        "name": "Create a booking",
+        "summary": "A guest chooses a time, supplies attendee details, and creates a calendar event.",
+        "nodeIds": [
+          "booking-page",
+          "booking-api",
+          "booking-service",
+          "booking-db",
+          "calendar"
+        ]
+      },
+      {
+        "id": "availability",
+        "name": "Manage availability",
+        "summary": "A host defines schedules and date overrides used to calculate bookable slots.",
+        "nodeIds": [
+          "availability-ui",
+          "availability-api",
+          "availability-db"
+        ]
+      },
+      {
+        "id": "payments",
+        "name": "Collect payment",
+        "summary": "Paid event types create a payment intent before a booking is confirmed.",
+        "nodeIds": [
+          "booking-page",
+          "payment-service",
+          "stripe"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "booking-page",
+        "type": "UI_SURFACE",
+        "label": "Booking page",
+        "detail": "Guest-facing event page and booking form.",
+        "evidence": [
+          {
+            "path": "apps/web/app/(booking-page-wrapper)/[user]/[type]/page.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "booking-api",
+        "type": "ENDPOINT",
+        "label": "Booking endpoint",
+        "detail": "Validates the request and hands booking creation to the domain layer.",
+        "evidence": [
+          {
+            "path": "apps/api/v2/src/platform/bookings/2024-04-15/controllers/bookings.controller.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "booking-service",
+        "type": "SERVICE",
+        "label": "Create booking",
+        "detail": "Booking creation implementation, selected from the booking orchestration module.",
+        "evidence": [
+          {
+            "path": "packages/features/bookings/lib/handleNewBooking/createBooking.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "booking-db",
+        "type": "DATA_STORE",
+        "label": "Booking model",
+        "detail": "Persists booking state, attendees, references, and status.",
+        "evidence": [
+          {
+            "path": "packages/prisma/schema.prisma",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "calendar",
+        "type": "EXTERNAL_DEPENDENCY",
+        "label": "Calendar providers",
+        "detail": "Creates and updates events in connected calendars.",
+        "evidence": [
+          {
+            "path": "packages/features/calendars/lib/CalendarManager.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "availability-ui",
+        "type": "UI_SURFACE",
+        "label": "Availability editor",
+        "detail": "Host schedule editor and date overrides.",
+        "evidence": [
+          {
+            "path": "apps/web/app/(use-page-wrapper)/(main-nav)/availability/page.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "availability-api",
+        "type": "SERVICE",
+        "label": "Availability service",
+        "detail": "Calculates bookable windows from schedules and busy times.",
+        "evidence": [
+          {
+            "path": "packages/features/schedules/lib/slots.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "availability-db",
+        "type": "DATA_STORE",
+        "label": "Schedule model",
+        "detail": "Stores weekly schedules and date overrides.",
+        "evidence": [
+          {
+            "path": "packages/prisma/schema.prisma",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "payment-service",
+        "type": "SERVICE",
+        "label": "Payment orchestration",
+        "detail": "Creates payment intent and links it to a pending booking.",
+        "evidence": [
+          {
+            "path": "packages/app-store/stripepayment/lib/PaymentService.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "stripe",
+        "type": "EXTERNAL_DEPENDENCY",
+        "label": "Stripe",
+        "detail": "External payment processor.",
+        "evidence": [
+          {
+            "path": "packages/app-store/stripepayment/lib/PaymentService.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "deployment",
+        "type": "SERVICE",
+        "label": "Deployment configuration",
+        "detail": "Repository deployment example. This does not establish how any production installation is hosted.",
+        "basis": "repository",
+        "evidence": [
+          {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Repository-provided deployment configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-database",
+        "type": "DATA_STORE",
+        "label": "database · container",
+        "detail": "Service declared in docker-compose.yml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "data",
+        "evidence": [
+          {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Parsed services.database from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-redis",
+        "type": "DATA_STORE",
+        "label": "redis · container",
+        "detail": "Service declared in docker-compose.yml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "data",
+        "evidence": [
+          {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Parsed services.redis from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-calcom",
+        "type": "SERVICE",
+        "label": "calcom · container",
+        "detail": "Service declared in docker-compose.yml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Parsed services.calcom from the repository’s Compose configuration."
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "cal-e0",
+        "source": "booking-page",
+        "target": "booking-api",
+        "type": "ROUTES_TO",
+        "evidence": [
+          {
+            "path": "apps/web/app/(booking-page-wrapper)/[user]/[type]/page.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ]
+      },
+      {
+        "id": "cal-e1",
+        "source": "booking-api",
+        "target": "booking-service",
+        "type": "CALLS",
+        "evidence": [
+          {
+            "path": "apps/api/v2/src/platform/bookings/2024-04-15/controllers/bookings.controller.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ]
+      },
+      {
+        "id": "cal-e2",
+        "source": "booking-service",
+        "target": "booking-db",
+        "type": "WRITES_TO",
+        "evidence": [
+          {
+            "path": "packages/features/bookings/lib/handleNewBooking/createBooking.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ]
+      },
+      {
+        "id": "cal-e3",
+        "source": "booking-service",
+        "target": "calendar",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "packages/features/bookings/lib/handleNewBooking/createBooking.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ]
+      },
+      {
+        "id": "cal-e4",
+        "source": "availability-ui",
+        "target": "availability-api",
+        "type": "CALLS",
+        "evidence": [
+          {
+            "path": "apps/web/app/(use-page-wrapper)/(main-nav)/availability/page.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ]
+      },
+      {
+        "id": "cal-e5",
+        "source": "availability-api",
+        "target": "availability-db",
+        "type": "READS_FROM",
+        "evidence": [
+          {
+            "path": "packages/features/schedules/lib/slots.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ]
+      },
+      {
+        "id": "cal-e6",
+        "source": "booking-page",
+        "target": "payment-service",
+        "type": "CALLS",
+        "evidence": [
+          {
+            "path": "apps/web/app/(booking-page-wrapper)/[user]/[type]/page.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ]
+      },
+      {
+        "id": "cal-e7",
+        "source": "payment-service",
+        "target": "stripe",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "packages/app-store/stripepayment/lib/PaymentService.ts",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a"
+          }
+        ]
+      },
+      {
+        "id": "deployment-edge",
+        "source": "deployment",
+        "target": "booking-service",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Repository-provided deployment configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-calcom-database",
+        "source": "compose-calcom",
+        "target": "compose-database",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker-compose.yml",
+            "commitSha": "54343aa685ae8f33159d2f485ec4a57bad5c574a",
+            "note": "Explicit depends_on from calcom to database."
+          }
+        ]
+      }
+    ],
+    "evolution": [
+      {
+        "date": "2025-02-26T14:49:27Z",
+        "title": "feat: Introduce a 'slot no longer available' message ",
+        "detail": "## What does this PR do?\r\n- Ensures that unavailable slot isn't bookable. 'Confirm' button is disabled\r\n[Demo](https://www.loom.com/share/a61590231ee34131b78f7c9a65cda075)\r\n[Previous implementation Loom - UI changed after that](https://www.loom.com/share/c116e3dda86649c8bb0c360f44baaba8)\r\n\r\n[Minimum Booking Notice enforcement](https://www.loom.com/share/c92506bdf39e442e9d71fe13baa46dca)\r\n\r\n\r\n## Fixes in reservation logic. \r\n- It was considering the slot to be unavailable even for the booker for which it was reserved. Looks like a day zero implementation bug. \r\n- A slot could be reserved by multiple people which didn't make sense. \r\n\r\n\r\n## Deployment Plan\r\nAdd env variable. This is required t",
+        "capabilityId": "booking",
+        "files": 30,
+        "commitSha": "07789ba6971ba9fe32468151199351848522da88",
+        "prUrl": "https://github.com/calcom/cal.diy/pull/18935",
+        "prNumber": 18935,
+        "prTitle": "feat: Introduce a 'slot no longer available' message ",
+        "group": "Booking experience",
+        "value": "Guests receive a clear message when a selected time slot is no longer available, helping them recover and choose another time.",
+        "additions": 1372,
+        "deletions": 102,
+        "paths": [
+          ".env.example",
+          "apps/web/playwright/booking-limits.e2e.ts",
+          "apps/web/playwright/booking-pages.e2e.ts",
+          "apps/web/playwright/lib/testUtils.ts",
+          "apps/web/public/static/locales/en/common.json",
+          "apps/web/test/lib/getSchedule/selectedSlots.test.ts",
+          "apps/web/test/utils/bookingScenario/bookingScenario.ts",
+          "packages/features/bookings/Booker/Booker.tsx",
+          "packages/features/bookings/Booker/README.md",
+          "packages/features/bookings/Booker/__tests__/utils/isSlotEquivalent.test.ts",
+          "packages/features/bookings/Booker/components/AvailableTimeSlots.tsx",
+          "packages/features/bookings/Booker/components/BookEventForm/BookEventForm.tsx"
+        ]
+      }
+    ],
+    "evaluations": []
+  },
+  {
+    "schemaVersion": "0.2",
+    "repository": {
+      "owner": "saleor",
+      "name": "saleor",
+      "url": "https://github.com/saleor/saleor",
+      "purpose": "A GraphQL-first commerce platform for products, checkout, payments, and orders.",
+      "defaultBranch": "main",
+      "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4",
+      "analyzedAt": "2026-10-14T08:33:23Z",
+      "analysisTier": "precomputed",
+      "languages": [
+        "Python",
+        "GraphQL",
+        "Django"
+      ],
+      "limitations": [
+        "Curated product interpretation; source paths verified against the pinned repository tree. Relationships are interpretations, not a complete call graph.",
+        "Recent merged PR sample only. Merge dates do not prove deployment or customer availability.",
+        "No live repository ingestion or runtime tracing. Dashed infrastructure nodes are explicit assumptions."
+      ],
+      "snapshotDate": "2026-10-14T23:17:58.273Z"
+    },
+    "capabilities": [
+      {
+        "id": "checkout",
+        "name": "Complete checkout",
+        "summary": "A storefront updates a checkout, authorizes payment, and creates an order.",
+        "nodeIds": [
+          "graphql",
+          "checkout-resolver",
+          "checkout-service",
+          "checkout-model",
+          "payment-plugin"
+        ]
+      },
+      {
+        "id": "catalog",
+        "name": "Browse catalog",
+        "summary": "GraphQL queries expose products, variants, pricing, and availability.",
+        "nodeIds": [
+          "graphql",
+          "product-resolver",
+          "product-model"
+        ]
+      },
+      {
+        "id": "webhooks",
+        "name": "Notify integrations",
+        "summary": "Domain events are delivered to configured app webhooks.",
+        "nodeIds": [
+          "checkout-service",
+          "webhook-job",
+          "external-app"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "graphql",
+        "type": "ENDPOINT",
+        "label": "GraphQL API",
+        "detail": "Single typed API entry point for storefront and dashboard operations.",
+        "evidence": [
+          {
+            "path": "saleor/graphql/schema.graphql",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "checkout-resolver",
+        "type": "SERVICE",
+        "label": "Checkout mutations",
+        "detail": "Validates checkout operations and calls domain services.",
+        "evidence": [
+          {
+            "path": "saleor/graphql/checkout/mutations/checkout_complete.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "checkout-service",
+        "type": "SERVICE",
+        "label": "Checkout completion",
+        "detail": "Coordinates stock, payment, order creation, and events.",
+        "evidence": [
+          {
+            "path": "saleor/checkout/complete_checkout.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "checkout-model",
+        "type": "DATA_STORE",
+        "label": "Checkout + Order models",
+        "detail": "Persists commerce state and resulting orders.",
+        "evidence": [
+          {
+            "path": "saleor/checkout/models.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          },
+          {
+            "path": "saleor/order/models.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "payment-plugin",
+        "type": "EXTERNAL_DEPENDENCY",
+        "label": "Payment plugins",
+        "detail": "Provider boundary for authorization and capture.",
+        "evidence": [
+          {
+            "path": "saleor/payment/gateway.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "product-resolver",
+        "type": "SERVICE",
+        "label": "Product resolvers",
+        "detail": "Resolves catalog queries, filters, and channel context.",
+        "evidence": [
+          {
+            "path": "saleor/graphql/product/resolvers.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "product-model",
+        "type": "DATA_STORE",
+        "label": "Product models",
+        "detail": "Products, variants, media, and collections.",
+        "evidence": [
+          {
+            "path": "saleor/product/models.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "webhook-job",
+        "type": "JOB",
+        "label": "Webhook delivery",
+        "detail": "Asynchronously sends subscribed domain events.",
+        "evidence": [
+          {
+            "path": "saleor/webhook/transport/asynchronous/transport.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "external-app",
+        "type": "EXTERNAL_DEPENDENCY",
+        "label": "Saleor app",
+        "detail": "Receives signed webhook payloads.",
+        "evidence": [
+          {
+            "path": "saleor/webhook/models.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ],
+        "basis": "repository"
+      }
+    ],
+    "edges": [
+      {
+        "id": "saleor-e0",
+        "source": "graphql",
+        "target": "checkout-resolver",
+        "type": "ROUTES_TO",
+        "evidence": [
+          {
+            "path": "saleor/graphql/schema.graphql",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ]
+      },
+      {
+        "id": "saleor-e1",
+        "source": "checkout-resolver",
+        "target": "checkout-service",
+        "type": "CALLS",
+        "evidence": [
+          {
+            "path": "saleor/graphql/checkout/mutations/checkout_complete.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ]
+      },
+      {
+        "id": "saleor-e2",
+        "source": "checkout-service",
+        "target": "checkout-model",
+        "type": "WRITES_TO",
+        "evidence": [
+          {
+            "path": "saleor/checkout/complete_checkout.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ]
+      },
+      {
+        "id": "saleor-e3",
+        "source": "checkout-service",
+        "target": "payment-plugin",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "saleor/checkout/complete_checkout.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ]
+      },
+      {
+        "id": "saleor-e4",
+        "source": "graphql",
+        "target": "product-resolver",
+        "type": "ROUTES_TO",
+        "evidence": [
+          {
+            "path": "saleor/graphql/schema.graphql",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ]
+      },
+      {
+        "id": "saleor-e5",
+        "source": "product-resolver",
+        "target": "product-model",
+        "type": "READS_FROM",
+        "evidence": [
+          {
+            "path": "saleor/graphql/product/resolvers.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ]
+      },
+      {
+        "id": "saleor-e6",
+        "source": "checkout-service",
+        "target": "webhook-job",
+        "type": "EMITS",
+        "evidence": [
+          {
+            "path": "saleor/checkout/complete_checkout.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ]
+      },
+      {
+        "id": "saleor-e7",
+        "source": "webhook-job",
+        "target": "external-app",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "saleor/webhook/transport/asynchronous/transport.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4"
+          }
+        ]
+      }
+    ],
+    "evolution": [
+      {
+        "date": "2026-10-14T09:14:38Z",
+        "title": "fix: dev dependencies required to run HTTP server",
+        "detail": "This fixes Saleor crashing when dev dependencies are not installed. Closes #19890\r\n\r\nChanges:\r\n- Moved pytest-related code into `development folder (``saleor/core/random_data.py` -> `saleor/core/development/random_data.py`) which attempts to discourage developers from invoking test-related code into production code\r\n- Added GitHub workflow that checks uvicorn and Celery (incl. Beat) are able to boot properly with `--no-dev`\r\n- Fixed missing `setuptools` dependency which caused `razorpay` to not be importable\r\n\r\nWill be ported onto main (likely will not contain the `razorpay` workaround)\r\n\r\n\r\n\r\n\r\n# Impact\r\n\r\n- [ ] New migrations\r\n- [ ] New/Updated API fields or mutations\r\n- [ ] Deprecated API",
+        "capabilityId": "checkout",
+        "files": 17,
+        "commitSha": "84662ef8fb53785f192797b4d5f83f5d79135620",
+        "prUrl": "https://github.com/saleor/saleor/pull/19894",
+        "prNumber": 19894,
+        "prTitle": "fix: dev dependencies required to run HTTP server",
+        "group": "Developer experience",
+        "value": "Restores local HTTP server startup by correcting which development dependencies are required.",
+        "additions": 920,
+        "deletions": 536,
+        "paths": [
+          ".github/workflows/tests-and-linters.yml",
+          "AGENTS.md",
+          "pyproject.toml",
+          "saleor/asgi/tests/checks/__init__.py",
+          "saleor/asgi/tests/checks/check_uvicorn_starts.py",
+          "saleor/asgi/tests/checks/test_check_uvicorn_starts.py",
+          "saleor/core/development/__init__.py",
+          "saleor/core/development/random_data.py",
+          "saleor/core/development/tests/__init__.py",
+          "saleor/core/development/tests/test_random_data.py",
+          "saleor/core/management/commands/populatedb.py",
+          "saleor/core/tests/checks/__init__.py"
+        ]
+      },
+      {
+        "date": "2026-10-14T08:33:23Z",
+        "title": "feat: add per-channel availability toggle for product variants (#19795)",
+        "detail": "Forward-port of #19795 from 3.23 to main.\n\nAdds `ProductVariantChannelListing.is_available_for_purchase`, letting staff hide a variant in a single channel without deleting its listing and prices. A listing with the flag set to false is treated as if it did not exist for customers (availability, price range, checkout/order lines, promotions).\n\nPort adjustments for main:\n- Dropped the preorder threshold lines from the conflicting hunks; main removed the preorder API.\n- Kept `ADDED_IN_323`: the feature first ships in 3.23.\n- Kept migration 0215_productvariantchannellisting_is_available_for_purchase under its 3.23 name and added 0216 merge migration with main's 0215_merge_20261010_1621.\n- No CHA",
+        "capabilityId": "checkout",
+        "files": 27,
+        "commitSha": "925b69959a97c9deda7cdc85092494896d0aa1f4",
+        "prUrl": "https://github.com/saleor/saleor/pull/19911",
+        "prNumber": 19911,
+        "prTitle": "feat: add per-channel availability toggle for product variants (#19795)",
+        "group": "Catalog availability",
+        "value": "Lets merchants control whether a product variant is available in each sales channel. This PR references #19795; both entries may represent related work rather than separate launches.",
+        "additions": 1676,
+        "deletions": 55,
+        "paths": [
+          "saleor/checkout/calculations.py",
+          "saleor/checkout/fetch.py",
+          "saleor/checkout/problems.py",
+          "saleor/discount/utils/promotion.py",
+          "saleor/graphql/core/types/__init__.py",
+          "saleor/graphql/core/types/common.py",
+          "saleor/graphql/core/validators/__init__.py",
+          "saleor/graphql/product/bulk_mutations/product_variant_bulk_create.py",
+          "saleor/graphql/product/bulk_mutations/product_variant_bulk_update.py",
+          "saleor/graphql/product/dataloaders/products.py",
+          "saleor/graphql/product/filters/product_helpers.py",
+          "saleor/graphql/product/mutations/channels.py"
+        ]
+      },
+      {
+        "date": "2026-10-14T07:40:48Z",
+        "title": "feat: add per-channel availability toggle for product variants",
+        "detail": "Implements https://github.com/saleor/saleor/issues/19790\r\n\r\nhttps://linear.app/saleor/issue/FRS-262",
+        "capabilityId": "checkout",
+        "files": 27,
+        "commitSha": "73a2d5b4b3dd591efd3ea3c53fa976fb0fa3afe2",
+        "prUrl": "https://github.com/saleor/saleor/pull/19795",
+        "prNumber": 19795,
+        "prTitle": "feat: add per-channel availability toggle for product variants",
+        "group": "Catalog availability",
+        "value": "Adds per-channel availability controls for product variants, so merchants can manage channel-specific assortments.",
+        "additions": 1670,
+        "deletions": 55,
+        "paths": [
+          "CHANGELOG.md",
+          "saleor/checkout/calculations.py",
+          "saleor/checkout/fetch.py",
+          "saleor/checkout/problems.py",
+          "saleor/discount/utils/promotion.py",
+          "saleor/graphql/core/types/__init__.py",
+          "saleor/graphql/core/types/common.py",
+          "saleor/graphql/core/validators/__init__.py",
+          "saleor/graphql/product/bulk_mutations/product_variant_bulk_create.py",
+          "saleor/graphql/product/bulk_mutations/product_variant_bulk_update.py",
+          "saleor/graphql/product/dataloaders/products.py",
+          "saleor/graphql/product/filters/product_helpers.py"
+        ]
+      },
+      {
+        "date": "2026-10-14T07:27:36Z",
+        "title": "feat(seo): add translatable descriptions to categories and collections",
+        "detail": "Port #19850 to main.",
+        "capabilityId": "checkout",
+        "files": 22,
+        "commitSha": "419ddefeb171761feabad92178008ef6a49fbb17",
+        "prUrl": "https://github.com/saleor/saleor/pull/19902",
+        "prNumber": 19902,
+        "prTitle": "feat(seo): add translatable descriptions to categories and collections",
+        "group": "Catalog localization",
+        "value": "Allows category and collection descriptions to be translated for different storefront languages.",
+        "additions": 1295,
+        "deletions": 16,
+        "paths": [
+          "saleor/core/management/commands/clean_editorjs_fields.py",
+          "saleor/core/tests/commands/test_clean_editorjs_fields.py",
+          "saleor/graphql/core/validators/__init__.py",
+          "saleor/graphql/product/mutations/category/category_create.py",
+          "saleor/graphql/product/mutations/collection/collection_create.py",
+          "saleor/graphql/product/tests/mutations/test_category_collection_full_description.py",
+          "saleor/graphql/product/types/categories.py",
+          "saleor/graphql/product/types/collections.py",
+          "saleor/graphql/schema.graphql",
+          "saleor/graphql/translations/mutations/product_bulk_translate.py",
+          "saleor/graphql/translations/mutations/product_translate.py",
+          "saleor/graphql/translations/mutations/utils.py"
+        ]
+      }
+    ],
+    "evaluations": []
+  },
+  {
+    "schemaVersion": "0.2",
+    "repository": {
+      "owner": "langgenius",
+      "name": "dify",
+      "url": "https://github.com/langgenius/dify",
+      "purpose": "A visual platform for building AI workflows, agents, and retrieval applications.",
+      "defaultBranch": "main",
+      "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+      "analyzedAt": "2026-10-14T21:59:15Z",
+      "analysisTier": "precomputed",
+      "languages": [
+        "TypeScript",
+        "Python",
+        "React"
+      ],
+      "limitations": [
+        "Curated product interpretation; source paths verified against the pinned repository tree. Relationships are interpretations, not a complete call graph.",
+        "Recent merged PR sample only. Merge dates do not prove deployment or customer availability.",
+        "No live repository ingestion or runtime tracing. Dashed infrastructure nodes are explicit assumptions."
+      ],
+      "snapshotDate": "2026-10-14T23:18:01.701Z"
+    },
+    "capabilities": [
+      {
+        "id": "workflow",
+        "name": "Run an AI workflow",
+        "summary": "A published app sends input through a visual graph of model, tool, and logic nodes.",
+        "nodeIds": [
+          "workflow-ui",
+          "workflow-api",
+          "workflow-engine",
+          "run-store",
+          "model-provider"
+        ]
+      },
+      {
+        "id": "rag",
+        "name": "Retrieve knowledge",
+        "summary": "Documents are indexed and retrieved as context for model execution.",
+        "nodeIds": [
+          "dataset-ui",
+          "index-job",
+          "vector-store",
+          "workflow-engine"
+        ]
+      },
+      {
+        "id": "observe",
+        "name": "Inspect a run",
+        "summary": "Operators inspect inputs, outputs, node execution, timing, and errors.",
+        "nodeIds": [
+          "run-ui",
+          "run-api",
+          "run-store"
+        ]
+      }
+    ],
+    "nodes": [
+      {
+        "id": "workflow-ui",
+        "type": "UI_SURFACE",
+        "label": "Workflow canvas",
+        "detail": "Visual editor for connecting model, tool, and control nodes.",
+        "evidence": [
+          {
+            "path": "web/app/components/workflow/index.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "workflow-api",
+        "type": "ENDPOINT",
+        "label": "Workflow API",
+        "detail": "Accepts app execution requests and validates inputs.",
+        "evidence": [
+          {
+            "path": "api/controllers/console/app/workflow.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "workflow-engine",
+        "type": "SERVICE",
+        "label": "Workflow execution",
+        "detail": "Workflow entry coordinates execution and hands work to the workflow runtime.",
+        "evidence": [
+          {
+            "path": "api/core/workflow/workflow_entry.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "run-store",
+        "type": "DATA_STORE",
+        "label": "Workflow run records",
+        "detail": "Persists run status, node execution, inputs, outputs, and errors.",
+        "evidence": [
+          {
+            "path": "api/models/workflow.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "model-provider",
+        "type": "EXTERNAL_DEPENDENCY",
+        "label": "Model providers",
+        "detail": "Provider abstraction for hosted and local language models.",
+        "evidence": [
+          {
+            "path": "api/core/model_manager.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "dataset-ui",
+        "type": "UI_SURFACE",
+        "label": "Knowledge editor",
+        "detail": "Creates datasets and manages documents.",
+        "evidence": [
+          {
+            "path": "web/app/(commonLayout)/datasets/page.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "index-job",
+        "type": "JOB",
+        "label": "Document indexing",
+        "detail": "Segments, embeds, and indexes document content.",
+        "evidence": [
+          {
+            "path": "api/tasks/document_indexing_task.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "vector-store",
+        "type": "DATA_STORE",
+        "label": "Vector index",
+        "detail": "Stores embeddings used during retrieval.",
+        "evidence": [
+          {
+            "path": "api/core/rag/datasource/vdb/vector_factory.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "run-ui",
+        "type": "UI_SURFACE",
+        "label": "Run inspector",
+        "detail": "Shows node-level traces and outputs.",
+        "evidence": [
+          {
+            "path": "web/app/components/workflow/run/index.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "run-api",
+        "type": "ENDPOINT",
+        "label": "Run detail API",
+        "detail": "Returns persisted workflow and node execution details.",
+        "evidence": [
+          {
+            "path": "api/controllers/console/app/workflow.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ],
+        "basis": "repository"
+      },
+      {
+        "id": "deployment",
+        "type": "SERVICE",
+        "label": "Deployment configuration",
+        "detail": "Repository deployment example. This does not establish how any production installation is hosted.",
+        "basis": "repository",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-api",
+        "type": "SERVICE",
+        "label": "api · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.api from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-worker",
+        "type": "JOB",
+        "label": "worker · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.worker from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-worker_beat",
+        "type": "JOB",
+        "label": "worker_beat · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.worker_beat from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-web",
+        "type": "SERVICE",
+        "label": "web · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.web from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-db_postgres",
+        "type": "DATA_STORE",
+        "label": "db_postgres · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Optional profile: postgresql. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "data",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.db_postgres from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-db_mysql",
+        "type": "DATA_STORE",
+        "label": "db_mysql · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Optional profile: mysql. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "data",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.db_mysql from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-redis",
+        "type": "DATA_STORE",
+        "label": "redis · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "data",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.redis from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-sandbox",
+        "type": "SERVICE",
+        "label": "sandbox · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.sandbox from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-plugin_daemon",
+        "type": "SERVICE",
+        "label": "plugin_daemon · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.plugin_daemon from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-ssrf_proxy",
+        "type": "SERVICE",
+        "label": "ssrf_proxy · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.ssrf_proxy from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-nginx",
+        "type": "SERVICE",
+        "label": "nginx · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "application",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.nginx from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-weaviate",
+        "type": "DATA_STORE",
+        "label": "weaviate · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Optional profile: weaviate. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "data",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.weaviate from the repository’s Compose configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-qdrant",
+        "type": "DATA_STORE",
+        "label": "qdrant · container",
+        "detail": "Service declared in docker/docker-compose.yaml. Optional profile: qdrant. Repository deployment example, not a verified production instance.",
+        "basis": "repository",
+        "zone": "data",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Parsed services.qdrant from the repository’s Compose configuration."
+          }
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "id": "dify-e0",
+        "source": "workflow-ui",
+        "target": "workflow-api",
+        "type": "ROUTES_TO",
+        "evidence": [
+          {
+            "path": "web/app/components/workflow/index.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "dify-e1",
+        "source": "workflow-api",
+        "target": "workflow-engine",
+        "type": "CALLS",
+        "evidence": [
+          {
+            "path": "api/controllers/console/app/workflow.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "dify-e2",
+        "source": "workflow-engine",
+        "target": "run-store",
+        "type": "WRITES_TO",
+        "evidence": [
+          {
+            "path": "api/core/workflow/workflow_entry.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "dify-e3",
+        "source": "workflow-engine",
+        "target": "model-provider",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "api/core/workflow/workflow_entry.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "dify-e4",
+        "source": "dataset-ui",
+        "target": "index-job",
+        "type": "CALLS",
+        "evidence": [
+          {
+            "path": "web/app/(commonLayout)/datasets/page.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "dify-e5",
+        "source": "index-job",
+        "target": "vector-store",
+        "type": "WRITES_TO",
+        "evidence": [
+          {
+            "path": "api/tasks/document_indexing_task.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "dify-e6",
+        "source": "workflow-engine",
+        "target": "vector-store",
+        "type": "READS_FROM",
+        "evidence": [
+          {
+            "path": "api/core/workflow/workflow_entry.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "dify-e7",
+        "source": "run-ui",
+        "target": "run-api",
+        "type": "ROUTES_TO",
+        "evidence": [
+          {
+            "path": "web/app/components/workflow/run/index.tsx",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "dify-e8",
+        "source": "run-api",
+        "target": "run-store",
+        "type": "READS_FROM",
+        "evidence": [
+          {
+            "path": "api/controllers/console/app/workflow.py",
+            "note": "Verified source location; component role is a curated interpretation.",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143"
+          }
+        ]
+      },
+      {
+        "id": "deployment-edge",
+        "source": "deployment",
+        "target": "workflow-engine",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Repository-provided deployment configuration."
+          }
+        ]
+      },
+      {
+        "id": "compose-api-db_postgres",
+        "source": "compose-api",
+        "target": "compose-db_postgres",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from api to db_postgres."
+          }
+        ]
+      },
+      {
+        "id": "compose-api-db_mysql",
+        "source": "compose-api",
+        "target": "compose-db_mysql",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from api to db_mysql."
+          }
+        ]
+      },
+      {
+        "id": "compose-api-redis",
+        "source": "compose-api",
+        "target": "compose-redis",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from api to redis."
+          }
+        ]
+      },
+      {
+        "id": "compose-worker-db_postgres",
+        "source": "compose-worker",
+        "target": "compose-db_postgres",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from worker to db_postgres."
+          }
+        ]
+      },
+      {
+        "id": "compose-worker-db_mysql",
+        "source": "compose-worker",
+        "target": "compose-db_mysql",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from worker to db_mysql."
+          }
+        ]
+      },
+      {
+        "id": "compose-worker-redis",
+        "source": "compose-worker",
+        "target": "compose-redis",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from worker to redis."
+          }
+        ]
+      },
+      {
+        "id": "compose-worker_beat-db_postgres",
+        "source": "compose-worker_beat",
+        "target": "compose-db_postgres",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from worker_beat to db_postgres."
+          }
+        ]
+      },
+      {
+        "id": "compose-worker_beat-db_mysql",
+        "source": "compose-worker_beat",
+        "target": "compose-db_mysql",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from worker_beat to db_mysql."
+          }
+        ]
+      },
+      {
+        "id": "compose-worker_beat-redis",
+        "source": "compose-worker_beat",
+        "target": "compose-redis",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from worker_beat to redis."
+          }
+        ]
+      },
+      {
+        "id": "compose-plugin_daemon-db_postgres",
+        "source": "compose-plugin_daemon",
+        "target": "compose-db_postgres",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from plugin_daemon to db_postgres."
+          }
+        ]
+      },
+      {
+        "id": "compose-plugin_daemon-db_mysql",
+        "source": "compose-plugin_daemon",
+        "target": "compose-db_mysql",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from plugin_daemon to db_mysql."
+          }
+        ]
+      },
+      {
+        "id": "compose-nginx-api",
+        "source": "compose-nginx",
+        "target": "compose-api",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from nginx to api."
+          }
+        ]
+      },
+      {
+        "id": "compose-nginx-web",
+        "source": "compose-nginx",
+        "target": "compose-web",
+        "type": "DEPENDS_ON",
+        "evidence": [
+          {
+            "path": "docker/docker-compose.yaml",
+            "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+            "note": "Explicit depends_on from nginx to web."
+          }
+        ]
+      }
+    ],
+    "evolution": [
+      {
+        "date": "2026-10-14T22:07:29Z",
+        "title": "fix(structured_output): skip reasoning JSON when selecting output",
+        "detail": "## Summary\r\n\r\nFixes #43983\r\nFixes https://github.com/langgenius/dify/issues/44080\r\n\r\nStructured Output parses the whole accumulated message content, and providers concatenate a\r\nreasoning model's chain of thought into that content inside `` tags. When the reasoning\r\ncontains a JSON object of its own, the text is not valid JSON, so the repair fallback runs,\r\n`json_repair` turns it into a list of candidate objects and the first one wins — so the reasoning\r\nobject is returned as `structured_output` instead of the answer. The reported case comes back as\r\n`{\"think\": \"start\"}` even though the final response is the schema-shaped object.\r\n\r\nIn `_parse_structured_output`, when a response that opens w",
+        "capabilityId": "workflow",
+        "files": 2,
+        "commitSha": "f77facfe6520ed379d723288aed0b4806ad76143",
+        "prUrl": "https://github.com/langgenius/dify/pull/44005",
+        "prNumber": 44005,
+        "prTitle": "fix(structured_output): skip reasoning JSON when selecting output",
+        "group": "Workflow output reliability",
+        "value": "Selects the intended structured model output instead of mistaking JSON inside reasoning text for the answer.",
+        "additions": 111,
+        "deletions": 0,
+        "paths": [
+          "api/core/llm_generator/output_parser/structured_output.py",
+          "api/tests/unit_tests/core/llm_generator/output_parser/test_structured_output.py"
+        ]
+      },
+      {
+        "date": "2026-10-14T21:51:46Z",
+        "title": "fix(api): compare datasource credentials as JSON on MySQL",
+        "detail": "## Summary\r\n\r\nFixes #44037.\r\n\r\n## Screenshots\r\n\r\n\r\n\r\n## Checklist\r\n\r\n- [ ] This change requires a documentation update, included: [Dify Document](https://github.com/langgenius/dify-docs)\r\n- [x] I understand that this PR may be closed in case there was no previous discussion or issues. (This doesn't apply to typos!)\r\n- [x] I've verified the change and added or updated tests where meaningful regression risk justifies coverage.\r\n- [ ] I've updated the documentation accordingly.\r\n- [ ] I ran `make lint && make type-check` (backend) and `vp staged` (frontend) to appease the lint gods\r\n\r\n",
+        "capabilityId": "workflow",
+        "files": 2,
+        "commitSha": "ca7065e69b6da9f24ff9259c3f200a45c815bd48",
+        "prUrl": "https://github.com/langgenius/dify/pull/44039",
+        "prNumber": 44039,
+        "prTitle": "fix(api): compare datasource credentials as JSON on MySQL",
+        "group": "Knowledge integrations",
+        "value": "Fixes datasource credential comparisons on MySQL by treating credentials as JSON.",
+        "additions": 56,
+        "deletions": 3,
+        "paths": [
+          "api/repositories/data_source/credential_repository.py",
+          "api/tests/unit_tests/repositories/data_source/test_credential_repository.py"
+        ]
+      },
+      {
+        "date": "2026-10-14T21:45:47Z",
+        "title": "fix(api): accept MCP protocol version 2025-11-25",
+        "detail": "## Summary\n\nFixes #44064\n\nThe MCP client still offered `2025-06-18` and rejected an initialize result of `2025-11-25`, so saving an HTTP MCP server that speaks that revision failed after HTTP 200. The client now offers `2025-11-25` and still accepts `2024-11-05`, `2025-03-26`, and `2025-06-18` when a server negotiates down. The Dify MCP server's advertised versions stay on `2025-06-18`.\n\n## Screenshots\n\n| Before | After |\n| ------ | ----- |\n| n/a    | n/a   |\n\nNo UI change.\n\n## Checklist\n\n- [ ] This change requires a documentation update, included: [Dify Document](https://github.com/langgenius/dify-docs)\n- [X] I understand that this PR may be closed in case there was no previous discussion o",
+        "capabilityId": "workflow",
+        "files": 3,
+        "commitSha": "905f6b778290e445fa90fa23c95327e4ff98a78c",
+        "prUrl": "https://github.com/langgenius/dify/pull/44066",
+        "prNumber": 44066,
+        "prTitle": "fix(api): accept MCP protocol version 2025-11-25",
+        "group": "Tool interoperability",
+        "value": "Accepts an additional MCP protocol version so compatible tool connections are not rejected by version validation.",
+        "additions": 9,
+        "deletions": 3,
+        "paths": [
+          "api/core/mcp/entities.py",
+          "api/core/mcp/types.py",
+          "api/tests/unit_tests/core/mcp/test_types.py"
+        ]
+      },
+      {
+        "date": "2026-10-14T21:37:28Z",
+        "title": "fix(nodejs-client): replace stale user fields in native upload forms",
+        "detail": "## Summary\n\nFixes #44119.\n\nNative FormData retains old user values when reused for `fileUpload` or `audioToText`: the SDK appends the current user while the service API selects the first `user` field. A prepopulated form or second upload can therefore retain the previous user instead of the explicit method argument.\n\nReplace user fields with `FormData.set` when available, and keep the append path for legacy form-data without set. Preserve file payloads, upload routes and the existing form mutation behavior.\n\nAdds four real-fetch multipart cases covering both public methods with pre-existing user fields and form reuse. The local server verifies decoded user values, file content/name and unrel",
+        "capabilityId": "workflow",
+        "files": 2,
+        "commitSha": "f566fa4648d588a49ef8fd4774aed663b6c82470",
+        "prUrl": "https://github.com/langgenius/dify/pull/44120",
+        "prNumber": 44120,
+        "prTitle": "fix(nodejs-client): replace stale user fields in native upload forms",
+        "group": "SDK upload correctness",
+        "value": "Ensures reused upload forms use the current user rather than retaining a previous user field.",
+        "additions": 96,
+        "deletions": 4,
+        "paths": [
+          "sdks/nodejs-client/src/client/base.ts",
+          "sdks/nodejs-client/tests/form-user.integration.test.ts"
+        ]
+      }
+    ],
+    "evaluations": []
+  }
+]

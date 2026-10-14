@@ -1,41 +1,54 @@
 # GitViz
 
-GitViz is a work-in-progress public repository explorer. It turns an unfamiliar GitHub repository into an evidence-backed map of its product capabilities, implementation flows, architecture, and project evolution.
+Explore what a public repository does, how its capabilities connect to code, and how the project has evolved.
 
-**Live preview:** [gitviz.arpitsidana.chatgpt.site](https://gitviz.arpitsidana.chatgpt.site)  
-**Source:** [github.com/arpit-sidana/gitviz](https://github.com/arpit-sidana/gitviz)
+**GitHub Pages:** [arpit-sidana.github.io/gitviz](https://arpit-sidana.github.io/gitviz/)
 
-Paste a public repository URL to explore:
+**Source:** [arpit-sidana/gitviz](https://github.com/arpit-sidana/gitviz)
 
-- **Overview** — what the repository is and what GitViz can currently support.
-- **Product Flow** — product capabilities connected to the code that implements them.
-- **Architecture** — the system's major modules and dependencies.
-- **Evolution** — historical changes grounded in commits and releases.
-- **Evaluation** — inspectable answers with source evidence and limitations.
+**Previous hosting:** [ChatGPT Sites prototype](https://gitviz.arpitsidana.chatgpt.site) (legacy version)
 
-Readers can choose their own depth—**Orientation**, **Trace**, or **Inspect**—without being assigned a persona.
+## Work in progress
 
-GitViz is intentionally narrow for its first release. It uses deterministic code analysis as the source of truth and may use AI to enrich small, structured slices of the resulting graph. Generated claims must retain file-level provenance.
+This prototype provides three offline demo projects: [Cal.diy (formerly the Cal.com repository)](https://github.com/calcom/cal.diy), [Saleor](https://github.com/saleor/saleor), and [Dify](https://github.com/langgenius/dify). Live ingestion of arbitrary repositories is still in development.
 
-## Project status
+- **Overview:** product capabilities and entry points.
+- **Product Flow:** numbered journeys through implementation components.
+- **Architecture:** labeled connections, logical boundaries, repository Compose services, zoom, source inspection, and explicitly marked deployment assumptions.
+- **Evolution:** feature themes in the Product view; linked PRs, diffs, file counts, and plain-English summaries in the Git view.
+- **Sources & limits:** pinned source locations and honest coverage limitations.
 
-Work in progress. The locked product requirements are documented in [docs/PRD.md](docs/PRD.md). The current public prototype includes three precomputed repository demonstrations, the five exploration views, a shared depth selector, source-evidence inspection, project evolution, and known-answer evaluation. Live repository ingestion and deterministic analyzers remain in development.
+Choose **Summary**, **How it works**, or **Source files** to control the information shown. Light/dark mode initially follows the browser; an explicit toggle is saved on your device.
 
-## MVP focus
+## Evidence and limitations
 
-- Public GitHub repositories
-- Deep analysis for Python and JavaScript/TypeScript
-- Reduced file-structure analysis for other languages
-- Overview, Product Flow, Architecture, Evolution, and Evaluation views
-- Precomputed demos for a reliable hosted experience
+The previous illustrative commit IDs and history have been replaced with snapshots captured from GitHub. The source tree verifies file paths. PR dates and change counts come from the public API. Product labels, architecture connections, and feature groupings are curated interpretations; they are not a runtime trace or a complete call graph. Merge dates are not launch dates. No measured evaluation pass rate is claimed.
 
-## What works today
+Snapshots live in `lib/snapshots/demos.json`. `scripts/refresh-demos.mjs` retrieves public metadata and selected deployment configuration at build time. Browsing the demos requires no GitHub credentials or model inference. The original prototype data in `lib/demo-data.ts` is used only as a curation seed, not served to visitors.
 
-- Switch between Cal.com, Saleor, and Dify snapshots.
-- Explore Overview, Product Flow, Architecture, Evolution, and Evaluation.
-- Choose Orientation, Trace, or Inspect depth across every view.
-- Select components and inspect repository-relative source evidence.
-- See explicit limitations where structural evidence cannot prove runtime behavior.
+## Development and deployment
+
+Requires Node 24 and npm.
+
+```sh
+npm ci
+npm run dev
+npm test
+npm run typecheck
+GITHUB_PAGES=true npm run build
+```
+
+The static export is written to `out/` with the `/gitviz` asset base path for GitHub Pages. `.github/workflows/pages.yml` runs the tests, type check, and export on GitHub. Deployment depends on all validation succeeding. Pull requests validate without deploying. Pages is configured to use GitHub Actions.
+
+To deliberately refresh the public snapshots:
+
+```sh
+npm run refresh:demos
+```
+
+Review source selection and summaries before committing the generated data. The previous Sites remote is retained; it is not automatically deployed by this workflow.
+
+See the [PRD](docs/PRD.md) for scope and product decisions.
 
 ## License
 
